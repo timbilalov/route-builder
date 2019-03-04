@@ -5,7 +5,19 @@
 	<div class="container clearfix">
 		<h1>Route Builder</h1>
 
+		<div class="inputs">
+			<div><input type="text" value="Ореховый проезд, 43к2"></div>
+			<div><input type="text" value="Старокаширское шоссе, 2"></div>
+			<div><input type="text" value="улица Вавилова, 57А"></div>
+			<div><input type="text" value="Домодедовская улица, 18"></div>
+			<div><input type="text" value="Ореховый бульвар, 14к2"></div>
+			<div><button data-update-map>Построить маршрут</button></div>
+		</div>
+
 		<div id="map" class="map"></div>
 		<script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+
+		<div data-description style="margin: 20px 0; word-break: break-all;"></div>
+		<a href="" data-link-to-app>Передать маршрут в приложение Яндекс.Карты</a>
 	</div>
 {% endblock content %}
