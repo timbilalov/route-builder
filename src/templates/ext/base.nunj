@@ -6,7 +6,7 @@
 	<head>
 		<!-- Client-side programming by sborkaproject.com -->
 		<meta charset="utf-8" />
-		<title>{% block title %}| Start Project{% endblock %}</title>
+		<title>{% block title %}| Route Builder{% endblock %}</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
 		{{ headScripts() }}
@@ -20,7 +20,7 @@
 			<div class="wrapper__header">
 				<div class="header">
 					<div class="container">
-						{{ menu() }}
+						Header Content
 					</div>
 				</div>
 			</div>
