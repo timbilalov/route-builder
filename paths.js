@@ -11,7 +11,7 @@ export default {
 	},
 	dist: {
 		from: 'build/**/*.*',
-		to: 'dist/',
+		to: 'docs/',
 	},
 	src: {
 		templates: './src/templates/',
