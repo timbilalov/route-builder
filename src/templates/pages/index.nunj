@@ -6,12 +6,15 @@
 		<h1>Route Builder</h1>
 
 		<div class="inputs">
-			<div><input type="text" value="Ореховый проезд, 43к2"></div>
-			<div><input type="text" value="Старокаширское шоссе, 2"></div>
-			<div><input type="text" value="улица Вавилова, 57А"></div>
-			<div><input type="text" value="Домодедовская улица, 18"></div>
-			<div><input type="text" value="Ореховый бульвар, 14к2"></div>
+			<div><button data-start-voice-listening>Запустить голосовой ввод</button></div>
+			<div><button data-stop-voice-listening>Остановить голосовой ввод</button></div>
+			<div><input type="text"></div>
+			<div><input type="text"></div>
+			<div><input type="text"></div>
+			<div><input type="text"></div>
+			<div><input type="text"></div>
 			<div><button data-update-map>Построить маршрут</button></div>
+			<div><button data-clear-inputs>Очистить поля</button></div>
 		</div>
 
 		<div id="map" class="map"></div>

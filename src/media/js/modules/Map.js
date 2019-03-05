@@ -22,18 +22,16 @@ function Map() {
 	});
 
 	dom.$body.on('click', '[data-update-map]', () => this.update());
+	this.$inputs.on('change', () => this.update());
+	dom.$body.on('click', '[data-clear-inputs]', () => this._clearInputs());
 }
 
 Map.prototype = {
 	update() {
 		console.log('update fired');
 		let points = [];
-		this.$description.html('');
-		this.$linkToApp.attr('href', '');
 
-		this.ymap.geoObjects.removeAll();
-		console.log('map cleared');
-
+		this._clearMap();
 		this.$inputs.each((index, elem) => !!elem.value && points.push(elem.value));
 
 		if (points.length < 2) {
@@ -66,6 +64,18 @@ Map.prototype = {
 					this._initMultiRoute(objectsSorted);
 				});
 		};
+	},
+
+	_clearMap() {
+		this.$description.html('');
+		this.$linkToApp.attr('href', '');
+		this.ymap && this.ymap.geoObjects.removeAll();
+		console.log('map cleared');
+	},
+
+	_clearInputs() {
+		this.$inputs.val('');
+		console.log('inputs cleared');
 	},
 
 	_initMultiRoute(points) {
