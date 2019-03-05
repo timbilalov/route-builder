@@ -1,6 +1,7 @@
 import gulp from 'gulp';
 import clean from './gulp-tasks/clean';
 import html from './gulp-tasks/html';
+import dist from './gulp-tasks/dist';
 import styles from './gulp-tasks/styles';
 import fonts from './gulp-tasks/fonts';
 import assetsVersion from './gulp-tasks/assets-version';
@@ -13,7 +14,7 @@ import server from './gulp-tasks/server';
 
 gulp.task('build', gulp.parallel(html, styles, fonts, images, svg, webpack));
 
-gulp.task('production', gulp.series(clean, 'build', assetsVersion));
+gulp.task('production', gulp.series(clean, 'build', assetsVersion, dist));
 
 gulp.task('zip', gulp.series('production', zip));
 

@@ -9,6 +9,10 @@ export default {
 		svg: 'build/media/svg/',
 		videos: 'build/media/video/',
 	},
+	dist: {
+		from: 'build/**/*.*',
+		to: 'dist/',
+	},
 	src: {
 		templates: './src/templates/',
 		nunj: 'src/templates/pages/**/*.nunj',

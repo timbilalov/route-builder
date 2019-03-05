@@ -1,5 +1,3 @@
-/* globals webkitSpeechRecognition */
-
 const dom = require('../utils/DOM');
 const env = require('../utils/ENV');
 
@@ -14,15 +12,18 @@ function VoiceInput() {
 	var ignore_onend;
 	var recognition;
 	var self = this;
+	var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+	// var SpeechRecognitionEvent = window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
 
-	if (!('webkitSpeechRecognition' in window)) {
+	if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
 		console.warn(`Speech recognition isn't supported in your browser`);
 		env.isMobile && alert(`Speech recognition isn't supported in your browser`);
 		return;
 	} else {
-		recognition = new webkitSpeechRecognition();
+		recognition = new SpeechRecognition();
 		recognition.continuous = true;
 		recognition.interimResults = true;
+		recognition.lang = 'ru-RU';
 
 		recognition.onstart = function() {
 			recognizing = true;
@@ -83,7 +84,6 @@ function VoiceInput() {
 		}
 		console.log('startListening');
 		final_transcript = '';
-		recognition.lang = 'ru';
 		recognition.start();
 		ignore_onend = false;
 	}
