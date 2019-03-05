@@ -21,6 +21,5 @@
 		<script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
 
 		<div data-description style="margin: 20px 0; word-break: break-all;"></div>
-		<a href="" data-link-to-app>Передать маршрут в приложение Яндекс.Карты</a>
 	</div>
 {% endblock content %}

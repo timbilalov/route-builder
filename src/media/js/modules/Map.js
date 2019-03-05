@@ -12,10 +12,13 @@ function Map() {
 	this.$description = dom.$body.find('[data-description]');
 	this.$linkToApp = dom.$body.find('[data-link-to-app]');
 
+	this.mapCenterCoordinates = [55.753994, 37.622093];
+	this.mapZoom = 9;
+
 	ymaps.ready(() => {
 		this.ymap = new ymaps.Map('map', {
-			center: [55.753994, 37.622093],
-			zoom: 9,
+			center: this.mapCenterCoordinates,
+			zoom: this.mapZoom,
 			controls: [],
 		});
 		console.log('map created');
@@ -121,24 +124,39 @@ Map.prototype = {
 
 			let resText = routesText.join('<br><br>');
 			let coordinates = points.slice(0).map(el => el.geometry._coordinates);
-			let hrefParts = [];
 
-			hrefParts.push(`lat_from=${coordinates[0][0]}&lon_from=${coordinates[0][1]}`);
-			hrefParts.push(
+			let hrefParts = [];
+			hrefParts.push(`z=${this.mapZoom}`);
+			hrefParts.push(`ll=` + this.mapCenterCoordinates.slice(0).reverse().join(','));
+			hrefParts.push(`l=map`);
+			hrefParts.push('rtext=' + coordinates.map(el => `${el[0]},${el[1]}`).join('~'));
+			hrefParts.push(`rtn=0`);
+			hrefParts.push(`rtt=pd`);
+			hrefParts.push(`rtm=atm`);
+			hrefParts.push(`origin=jsapi_2_1_72`);
+			hrefParts.push(`from=api-maps`);
+			hrefParts.push(`mode=routes`);
+
+			let hrefParts2 = [];
+			hrefParts2.push(`lat_from=${coordinates[0][0]}&lon_from=${coordinates[0][1]}`);
+			hrefParts2.push(
 				`lat_to=${coordinates[coordinates.length - 1][0]}&lon_to=${coordinates[coordinates.length - 1][1]}`
 			);
 			if (coordinates.length > 2) {
 				let coordinatesVia = coordinates.slice(1, coordinates.length - 1);
 				for (let j = 0; j < coordinatesVia.length; j++) {
-					hrefParts.push(`lat_via_${j}=${coordinatesVia[j][0]}&lon_via_${j}=${coordinatesVia[j][1]}`);
+					hrefParts2.push(`lat_via_${j}=${coordinatesVia[j][0]}&lon_via_${j}=${coordinatesVia[j][1]}`);
 				}
 			}
+			hrefParts2.push(`rtt=pd`);
 
-			hrefParts.push(`rtt=pd`);
 			let resHref = hrefParts.join('&');
-			let href = `yandexmaps://build_route_on_map?${resHref}`;
+			let resHref2 = hrefParts2.join('&');
+			let href = `https://yandex.ru/maps/?${resHref}`;
+			let href2 = `yandexmaps://build_route_on_map?${resHref2}`;
 			this.$linkToApp.attr('href', href);
-			resText += `<br><br>link href: ${href}`;
+			resText += `<br><br>link href: <a href="${href}" target="_blank" rel="nofollow">${href}</a>`;
+			resText += `<br>link href 2: <a href="${href2}" target="_blank" rel="nofollow">${href2}</a>`;
 			this.$description.html(resText);
 		});
 

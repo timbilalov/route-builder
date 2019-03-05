@@ -56,6 +56,9 @@ function VoiceInput() {
 						.first()
 						.val(linebreak(final_transcript))
 						.trigger('change');
+					setTimeout(() => {
+						recognition.start();
+					}, 500);
 				} else {
 					interim_transcript += event.results[i][0].transcript;
 				}
