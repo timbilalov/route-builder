@@ -21,7 +21,7 @@ function VoiceInput() {
 		return;
 	} else {
 		recognition = new SpeechRecognition();
-		recognition.continuous = true;
+		recognition.continuous = false;
 		recognition.interimResults = true;
 		recognition.lang = 'ru-RU';
 
