@@ -24,12 +24,47 @@ function Map() {
 		console.log('map created');
 	});
 
+	this.savedValues = this.loadValues();
+	if (this.savedValues) {
+		let needToUpdate = false;
+		for (let p in this.savedValues) {
+			if (this.savedValues[p]) {
+				this.$inputs.eq(parseInt(p)).val(this.savedValues[p]);
+				needToUpdate = true;
+			}
+		}
+		if (needToUpdate) {
+			setTimeout(() => this.update(), 2000);
+		}
+	}
 	dom.$body.on('click', '[data-update-map]', () => this.update());
-	this.$inputs.on('change', () => this.update());
+	this.$inputs.on('change', () => {
+		this.saveValues();
+		this.update();
+	});
 	dom.$body.on('click', '[data-clear-inputs]', () => this._clearInputs());
 }
 
 Map.prototype = {
+	loadValues() {
+		let str = localStorage.getItem('saved-values');
+		if (!str) {
+			return false;
+		}
+
+		let obj = JSON.parse(str);
+		return obj;
+	},
+	saveValues() {
+		let values = {};
+		this.$inputs.each((index, elem) => {
+			let $input = $(elem);
+			let value = $input.val();
+			values[index] = value;
+		});
+		let res = JSON.stringify(values);
+		localStorage.setItem('saved-values', res);
+	},
 	update() {
 		console.log('update fired');
 		let points = [];
@@ -114,8 +149,25 @@ Map.prototype = {
 				for (let j = 0; j < routePaths.length; j++) {
 					let path = routePaths[j];
 
-					text.push(`Длина участка: ${path.properties.get('distance').text}`);
-					text.push(`Длительность участка: ${path.properties.get('duration').text}`);
+					let pathCoords = path.properties.get('coordinates');
+					let pathHref = '';
+					let pathHrefParts = [];
+					pathHrefParts.push(`z=${this.mapZoom}`);
+					pathHrefParts.push(`ll=` + this.mapCenterCoordinates.slice(0).reverse().join(','));
+					pathHrefParts.push(`l=map`);
+					pathHrefParts.push('rtext=' + pathCoords[0].join(',') + '~' + pathCoords[pathCoords.length - 1].join(','));
+					pathHrefParts.push(`rtn=0`);
+					pathHrefParts.push(`rtt=pd`);
+					pathHrefParts.push(`rtm=atm`);
+					pathHrefParts.push(`origin=jsapi_2_1_72`);
+					pathHrefParts.push(`from=api-maps`);
+					pathHrefParts.push(`mode=routes`);
+
+					pathHref = `https://yandex.ru/maps/?${pathHrefParts.join('&')}`;
+
+					text.push(`<br><i>Длина участка: ${path.properties.get('distance').text}</i>`);
+					text.push(`<i>Длительность участка: ${path.properties.get('duration').text}</i>`);
+					text.push(`<i><a href="${pathHref}" target="_blank" rel="nofollow">Навигация по участку</a></i>`);
 				}
 
 				text = text.join('<br>');
