@@ -5,16 +5,29 @@
 	<div class="container clearfix">
 		<h1>Route Builder</h1>
 
+		<style>
+			.input-block {
+				position: relative;
+			}
+
+			.input-block > small {
+				position: absolute;
+				right: 100%;
+				top: 0;
+				margin-right: 10px;
+			}
+		</style>
+
 		<div class="inputs">
 			<div><button data-start-voice-listening>Запустить голосовой ввод</button></div>
 			<div><button data-stop-voice-listening>Остановить голосовой ввод</button></div>
-			<div><input type="text"></div>
-			<div><input type="text"></div>
-			<div><input type="text"></div>
-			<div><input type="text"></div>
-			<div><input type="text"></div>
+
+			{% for i in range(1, 15) %}
+				<div class="input-block"><small data-order-entered></small><input type="text"><button data-clear-input tabindex="-1">x</button></div>
+			{% endfor %}
+
+			<div><button data-clear-inputs>Очистить все поля</button></div>
 			<div><button data-update-map>Построить маршрут</button></div>
-			<div><button data-clear-inputs>Очистить поля</button></div>
 		</div>
 
 		<div id="map" class="map"></div>

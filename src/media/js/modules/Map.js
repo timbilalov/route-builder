@@ -2,11 +2,20 @@
 
 const dom = require('../utils/DOM');
 
+const DURATION_MILTIPLIER = 1 / 2;
+
+function getPrettyDuration(durationValueRaw) {
+	let duration = durationValueRaw * DURATION_MILTIPLIER;
+	return '~ ' + Math.round(duration / 60) + ' мин';
+}
+
 // NOTE:
 // https://tech.yandex.ru/maps/doc/jsapi/2.1/ref/reference/geoQuery-docpage/
 // https://tech.yandex.ru/maps/doc/jsapi/2.1/ref/reference/multiRouter.MultiRoute-docpage/
 // https://tech.yandex.ru/maps/jsbox/2.1/multiroute_data_access
 // https://tech.yandex.ru/yandex-apps-launch/navigator/doc/concepts/navigator-url-params-docpage/
+// https://tech.yandex.ru/maps/jsbox/2.1/multiroute_view_options
+// https://tech.yandex.ru/maps/doc/jsapi/2.1/ref/reference/option.presetStorage-docpage/
 function Map() {
 	this.$inputs = dom.$body.find('.inputs input');
 	this.$description = dom.$body.find('[data-description]');
@@ -43,6 +52,7 @@ function Map() {
 		this.update();
 	});
 	dom.$body.on('click', '[data-clear-inputs]', () => this._clearInputs());
+	dom.$body.on('click', '[data-clear-input]', e => this._clearInput(e));
 }
 
 Map.prototype = {
@@ -70,7 +80,19 @@ Map.prototype = {
 		let points = [];
 
 		this._clearMap();
-		this.$inputs.each((index, elem) => !!elem.value && points.push(elem.value));
+		let numEntered = 0;
+		this.$inputs.each((index, elem) => {
+			let $elem = $(elem);
+			let $num = $elem.parent().find('[data-order-entered]');
+			if (elem.value) {
+				points.push(elem.value);
+				$num.text(++numEntered + '.');
+			} else {
+				$num.text('');
+			}
+		});
+
+		this.recognizedAddresses = [];
 
 		if (points.length < 2) {
 			return;
@@ -81,11 +103,20 @@ Map.prototype = {
 		for (let i = 0; i < points.length; i++) {
 			let query = ymaps.geoQuery(ymaps.geocode(points[i])).then(() => {
 				objects[i] = query._objects[0];
+
+				this.recognizedAddresses.push({
+					name: points[i],
+					orderEntered: i + 1,
+					coords: query._objects[0].geometry._coordinates,
+				});
+
 				if (--count <= 0) {
 					complete();
 				}
 			});
 		}
+
+		console.log(this.recognizedAddresses);
 
 		let complete = () => {
 			console.log('all requests completed');
@@ -104,6 +135,23 @@ Map.prototype = {
 		};
 	},
 
+	_getAddressByCoords(coords) {
+		if (!this.recognizedAddresses || !this.recognizedAddresses.length) {
+			return false;
+		}
+
+		let res = false;
+		let tolerance = 0.0004;
+		for (let i = 0; i < this.recognizedAddresses.length; i++) {
+			let address = this.recognizedAddresses[i];
+			let addressCoords = address.coords;
+			if (Math.abs(addressCoords[0] - coords[0]) <= tolerance && Math.abs(addressCoords[1] - coords[1]) <= tolerance) {
+				res = address;
+			}
+		}
+		return res;
+	},
+
 	_clearMap() {
 		this.$description.html('');
 		this.$linkToApp.attr('href', '');
@@ -112,12 +160,25 @@ Map.prototype = {
 	},
 
 	_clearInputs() {
-		this.$inputs.val('');
+		this.$inputs.val('').trigger('change');
 		console.log('inputs cleared');
+	},
+
+	_clearInput(e) {
+		let $target = $(e.currentTarget);
+		let $input = $target.parent().find(this.$inputs);
+		$input.val('').trigger('change');
+		console.log('input cleared');
 	},
 
 	_initMultiRoute(points) {
 		console.log('_initMultiRoute', points);
+
+		let orderSortedArr = [];
+		points.forEach(p => {
+			let address = this._getAddressByCoords(p.geometry._coordinates);
+			orderSortedArr.push(address.orderEntered);
+		});
 
 		var multiRoute = new ymaps.multiRouter.MultiRoute(
 			{
@@ -135,6 +196,21 @@ Map.prototype = {
 		// Подробнее о событии в справочнике.
 		// Обратите внимание, подписка осуществляется для поля model.
 		multiRoute.model.events.add('requestsuccess', () => {
+			for (let i = 0; i < this.recognizedAddresses.length; i++) {
+				let wayPoint = multiRoute.getWayPoints().get(i);
+
+				ymaps.geoObject.addon.balloon.get(wayPoint);
+				let wayPointCoords = wayPoint.geometry._coordinates;
+				let wayPointName = '' + this._getAddressByCoords(wayPointCoords).orderEntered;
+				let wayPointAddress = this._getAddressByCoords(wayPointCoords).name;
+
+				wayPoint.options.set({
+					preset: 'islands#darkGreenCircleIcon',
+					iconContentLayout: ymaps.templateLayoutFactory.createClass(wayPointName),
+					balloonContentLayout: ymaps.templateLayoutFactory.createClass(wayPointAddress),
+				});
+			}
+
 			let allRoutes = multiRoute.model.getRoutes();
 			let routesText = [];
 
@@ -142,8 +218,10 @@ Map.prototype = {
 				let route = allRoutes[i];
 				let routePaths = route.getPaths();
 				let text = [];
+				text.push(`<br><b>Вариант маршрута №${i + 1}</b>`);
+				text.push(`Порядок адресов: ${orderSortedArr.join(', ')}`);
 				text.push(`Длина маршрута: ${route.properties.get('distance').text}`);
-				text.push(`Длительность маршрута: ${route.properties.get('duration').text}`);
+				text.push(`Длительность маршрута: ${getPrettyDuration(route.properties.get('duration').value)}`);
 				text.push(`Маршрут состоит из ${routePaths.length} участков:`);
 
 				for (let j = 0; j < routePaths.length; j++) {
@@ -153,7 +231,13 @@ Map.prototype = {
 					let pathHref = '';
 					let pathHrefParts = [];
 					pathHrefParts.push(`z=${this.mapZoom}`);
-					pathHrefParts.push(`ll=` + this.mapCenterCoordinates.slice(0).reverse().join(','));
+					pathHrefParts.push(
+						`ll=` +
+							this.mapCenterCoordinates
+								.slice(0)
+								.reverse()
+								.join(',')
+					);
 					pathHrefParts.push(`l=map`);
 					pathHrefParts.push('rtext=' + pathCoords[0].join(',') + '~' + pathCoords[pathCoords.length - 1].join(','));
 					pathHrefParts.push(`rtn=0`);
@@ -165,8 +249,16 @@ Map.prototype = {
 
 					pathHref = `https://yandex.ru/maps/?${pathHrefParts.join('&')}`;
 
-					text.push(`<br><i>Длина участка: ${path.properties.get('distance').text}</i>`);
-					text.push(`<i>Длительность участка: ${path.properties.get('duration').text}</i>`);
+					let pathAddressStart = this._getAddressByCoords(pathCoords[0]);
+					let pathAddressEnd = this._getAddressByCoords(pathCoords[pathCoords.length - 1]);
+
+					text.push(
+						`<br><i>${pathAddressStart.name} (${pathAddressStart.orderEntered}) → ${pathAddressEnd.name} (${
+							pathAddressEnd.orderEntered
+						})</i>`
+					);
+					text.push(`<i>Длина участка: ${path.properties.get('distance').text}</i>`);
+					text.push(`<i>Длительность участка: ${getPrettyDuration(path.properties.get('duration').value)}</i>`);
 					text.push(`<i><a href="${pathHref}" target="_blank" rel="nofollow">Навигация по участку</a></i>`);
 				}
 
@@ -179,7 +271,13 @@ Map.prototype = {
 
 			let hrefParts = [];
 			hrefParts.push(`z=${this.mapZoom}`);
-			hrefParts.push(`ll=` + this.mapCenterCoordinates.slice(0).reverse().join(','));
+			hrefParts.push(
+				`ll=` +
+					this.mapCenterCoordinates
+						.slice(0)
+						.reverse()
+						.join(',')
+			);
 			hrefParts.push(`l=map`);
 			hrefParts.push('rtext=' + coordinates.map(el => `${el[0]},${el[1]}`).join('~'));
 			hrefParts.push(`rtn=0`);
@@ -207,8 +305,8 @@ Map.prototype = {
 			let href = `https://yandex.ru/maps/?${resHref}`;
 			let href2 = `yandexmaps://build_route_on_map?${resHref2}`;
 			this.$linkToApp.attr('href', href);
-			resText += `<br><br>link href: <a href="${href}" target="_blank" rel="nofollow">${href}</a>`;
-			resText += `<br>link href 2: <a href="${href2}" target="_blank" rel="nofollow">${href2}</a>`;
+			resText += `<br><br><a href="${href}" target="_blank" rel="nofollow">Общая навигация (вариант 1)</a>`;
+			resText += `<br><a href="${href2}" target="_blank" rel="nofollow">Общая навигация (вариант 2)</a>`;
 			this.$description.html(resText);
 		});
 
