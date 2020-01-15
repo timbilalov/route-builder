@@ -1,4 +1,6 @@
 import { TweenMax } from 'gsap';
+import ReactDOM from 'react-dom';
+import FieldsList from './containers/FieldsList';
 
 global.TweenMax = TweenMax;
 global.$ = global.jQuery = require('jquery');
@@ -18,6 +20,8 @@ const App = new function App() { // eslint-disable-line
 			// VoiceInput2: require('./modules/VoiceInput2'),
 		};
 	});
+
+	ReactDOM.render(<FieldsList />, document.getElementById('react-fields-list'));
 }();
 
 // App → ProjectName
