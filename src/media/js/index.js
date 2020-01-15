@@ -1,4 +1,5 @@
 import { TweenMax } from 'gsap';
+import * as React from 'react';
 import ReactDOM from 'react-dom';
 import FieldsList from './containers/FieldsList';
 
