@@ -1,7 +1,7 @@
 import { TweenMax } from 'gsap';
 import * as React from 'react';
 import ReactDOM from 'react-dom';
-import FieldsList from './containers/FieldsList';
+import ReactApp from './App';
 
 global.TweenMax = TweenMax;
 global.$ = global.jQuery = require('jquery');
@@ -22,7 +22,7 @@ const App = new function App() { // eslint-disable-line
 		};
 	});
 
-	ReactDOM.render(<FieldsList />, document.getElementById('react-fields-list'));
+	ReactDOM.render(<ReactApp />, document.getElementById('react-app'));
 }();
 
 // App → ProjectName
