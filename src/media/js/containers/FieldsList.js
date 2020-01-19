@@ -19,13 +19,31 @@ export class FieldsList extends React.Component {
 		this.props.onAddressesChange(addresses);
 	}
 
+	onRemoveButtonClick(target) {
+		const value = target.value;
+		const addresses = this.props.addresses.slice(0);
+		const index = addresses.indexOf(value);
+
+		if (index === -1) {
+			return;
+		}
+
+		addresses.splice(index, 1);
+		this.props.onAddressesChange(addresses);
+	}
+
 	render() {
 		const inputs = [];
 		const count = this.props.addresses.length;
 
 		for (let i = 0; i < count + 1; i++) {
 			inputs.push(
-				<FieldBlock key={i} onChange={event => this.onFieldChange(event, i)} value={this.props.addresses[i]} />
+				<FieldBlock
+					key={i}
+					onChange={event => this.onFieldChange(event, i)}
+					value={this.props.addresses[i]}
+					onRemoveButtonClick={this.onRemoveButtonClick.bind(this)}
+				/>
 			);
 		}
 
