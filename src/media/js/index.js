@@ -16,8 +16,8 @@ const App = new function App() { // eslint-disable-line
 		this.dom = require('./utils/DOM');
 		this.env = require('./utils/ENV');
 		this.modules = {
-			Map: require('./modules/Map'),
-			VoiceInput: require('./modules/VoiceInput'),
+			// Map: require('./modules/Map'),
+			// VoiceInput: require('./modules/VoiceInput'),
 			// VoiceInput2: require('./modules/VoiceInput2'),
 		};
 	});

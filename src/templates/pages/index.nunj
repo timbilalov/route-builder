@@ -34,10 +34,5 @@
 			<div><button data-clear-inputs>Очистить все поля</button></div>
 			<div><button data-update-map>Построить маршрут</button></div>
 		</div>
-
-		<div id="map" class="map"></div>
-		<script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
-
-		<div data-description style="margin: 20px 0; word-break: break-all;"></div>
 	</div>
 {% endblock content %}

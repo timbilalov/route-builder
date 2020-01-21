@@ -2,13 +2,18 @@ import React from 'react';
 import { FieldsList } from './containers/FieldsList';
 import { Map } from './containers/Map';
 
+const STORAGE_KEY = 'route-builder-state';
+
 class App extends React.Component {
 	// TODO: Задать стейт корневого элемента напрямую, если есть более подходящий синтаксис.
 	constructor(props) {
 		super(props);
-		this.state = {
+
+		const defaultState = {
 			addresses: [],
 		};
+		const stateFromStorage = this.storage('get');
+		this.state = stateFromStorage ? stateFromStorage : defaultState;
 	}
 
 	onAddressesChange(addresses) {
@@ -16,9 +21,24 @@ class App extends React.Component {
 			return;
 		}
 
-		this.setState({
-			addresses,
-		});
+		this.setState(
+			{
+				addresses,
+			},
+			() => this.storage('set')
+		);
+	}
+
+	storage(method = 'get') {
+		if (method === 'get') {
+			let state = localStorage.getItem(STORAGE_KEY);
+			if (state) {
+				state = JSON.parse(state);
+			}
+			return state;
+		} else if (method === 'set') {
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
+		}
 	}
 
 	render() {

@@ -40,6 +40,7 @@ export class FieldsList extends React.Component {
 			inputs.push(
 				<FieldBlock
 					key={i}
+					order={i + 1}
 					onChange={event => this.onFieldChange(event, i)}
 					value={this.props.addresses[i]}
 					onRemoveButtonClick={this.onRemoveButtonClick.bind(this)}
