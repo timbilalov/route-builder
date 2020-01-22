@@ -1,6 +1,7 @@
 import React from 'react';
 import { FieldsList } from './containers/FieldsList';
 import { Map } from './containers/Map';
+import Utils from './utils/Utils';
 
 const STORAGE_KEY = 'route-builder-state';
 
@@ -13,7 +14,11 @@ class App extends React.Component {
 			addresses: [],
 		};
 		const stateFromStorage = this.storage('get');
+
 		this.state = stateFromStorage ? stateFromStorage : defaultState;
+		this.addressesRawData = this.state.addresses || [];
+
+		this.updateAppStateDebounced = Utils.debounce(this.updateAppState.bind(this), 1000);
 	}
 
 	onAddressesChange(addresses) {
@@ -21,6 +26,12 @@ class App extends React.Component {
 			return;
 		}
 
+		this.addressesRawData = addresses;
+		this.updateAppStateDebounced();
+	}
+
+	updateAppState() {
+		const addresses = this.addressesRawData.slice(0);
 		this.setState(
 			{
 				addresses,
