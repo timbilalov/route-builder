@@ -1,6 +1,7 @@
 import React from 'react';
 import { FieldsList } from './containers/FieldsList';
 import { Map } from './containers/Map';
+import { Controls } from './containers/Controls';
 import Utils from './utils/Utils';
 
 const STORAGE_KEY = 'route-builder-state';
@@ -21,22 +22,47 @@ class App extends React.Component {
 		this.updateAppStateDebounced = Utils.debounce(this.updateAppState.bind(this), 1000);
 	}
 
-	onAddressesChange(addresses) {
+	onAddressesChange(addresses, immediately = false) {
 		if (!Array.isArray(addresses)) {
 			return;
 		}
 
 		this.addressesRawData = addresses;
-		this.updateAppStateDebounced();
+		if (immediately) {
+			this.updateAppState(() => this.setFieldsValues());
+		} else {
+			this.updateAppStateDebounced();
+		}
 	}
 
-	updateAppState() {
+	setFieldsValues() {
+		const fieldBlocks = this.refs.fieldsList.refs;
+		const addresses = this.state.addresses.slice(0);
+		for (const [key, fieldBlock] of Object.entries(fieldBlocks)) {
+			const index = parseInt(key.substring(key.match(/\d/).index), 10) - 1;
+			fieldBlock.setState({
+				value: addresses[index] || '',
+			});
+		}
+	}
+
+	onAddressesClear() {
+		this.addressesRawData = [];
+		this.updateAppState(() => this.setFieldsValues());
+	}
+
+	updateAppState(callback) {
 		const addresses = this.addressesRawData.slice(0);
 		this.setState(
 			{
 				addresses,
 			},
-			() => this.storage('set')
+			() => {
+				this.storage('set');
+				if (typeof callback === 'function') {
+					callback();
+				}
+			}
 		);
 	}
 
@@ -55,7 +81,12 @@ class App extends React.Component {
 	render() {
 		return (
 			<div>
-				<FieldsList addresses={this.state.addresses} onAddressesChange={this.onAddressesChange.bind(this)} />
+				<FieldsList
+					ref={'fieldsList'}
+					addresses={this.state.addresses}
+					onAddressesChange={this.onAddressesChange.bind(this)}
+				/>
+				<Controls addresses={this.state.addresses} onAddressesClear={this.onAddressesClear.bind(this)} />
 				<Map addresses={this.state.addresses} />
 			</div>
 		);

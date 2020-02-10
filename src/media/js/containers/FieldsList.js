@@ -29,7 +29,7 @@ export class FieldsList extends React.Component {
 		}
 
 		addresses.splice(index, 1);
-		this.props.onAddressesChange(addresses);
+		this.props.onAddressesChange(addresses, true);
 	}
 
 	render() {
@@ -41,6 +41,7 @@ export class FieldsList extends React.Component {
 				<FieldBlock
 					key={i}
 					order={i + 1}
+					ref={'fieldBlock' + (i + 1)}
 					onChange={event => this.onFieldChange(event, i)}
 					value={this.props.addresses[i]}
 					onRemoveButtonClick={this.onRemoveButtonClick.bind(this)}
