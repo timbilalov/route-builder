@@ -1,5 +1,6 @@
 import React from 'react';
-import { ClearAddressesControl } from '../components/ClearAddressesControl';
+import ClearAddressesControl from '../components/ClearAddressesControl';
+// import { ClearAddressesControl } from '../components/ClearAddressesControl';
 
 export class Controls extends React.Component {
 	constructor(props) {

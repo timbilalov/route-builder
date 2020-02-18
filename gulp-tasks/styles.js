@@ -39,7 +39,6 @@ const fixVieportHeight = postcss.plugin('postcss-fix-vh', function() {
 const PROCESSORS = [
 	fixVieportHeight(),
 	autoprefixer({
-		browsers: ['last 4 versions'],
 		cascade: true,
 	}),
 	assets({

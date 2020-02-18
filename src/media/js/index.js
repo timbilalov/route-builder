@@ -1,9 +1,7 @@
-import { TweenMax } from 'gsap';
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import ReactApp from './App';
 
-global.TweenMax = TweenMax;
 global.$ = global.jQuery = require('jquery');
 require('./utils/jqExtensions');
 

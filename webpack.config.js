@@ -13,7 +13,7 @@ const hotMiddlewareString = 'webpack-hot-middleware/client?quiet=true&noInfo=tru
 
 export const config = {
 	entry: Object.keys(entryPoints).reduce((acc, currentKey) => {
-		acc[currentKey] = [entryPoints[currentKey]];
+		acc[currentKey] = ['@babel/polyfill', entryPoints[currentKey]];
 		!PRODUCTION && hmrEnabled && acc[currentKey].push(hotMiddlewareString);
 		return acc;
 	}, {}),
