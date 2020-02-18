@@ -24,5 +24,10 @@
 		"react/no-string-refs": 0,
 		"react/prop-types": 0
 	},
-	"plugins": ["prettier", "react"]
+	"plugins": ["prettier", "react"],
+	"settings": {
+		"react": {
+			"version": "detect"
+		}
+	}
 }

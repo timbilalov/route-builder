@@ -1,7 +1,7 @@
 import React from 'react';
-import { FieldBlock } from '../components/FieldBlock';
+import FieldBlock from '../components/FieldBlock';
 
-export class FieldsList extends React.Component {
+class FieldsList extends React.Component {
 	constructor(props) {
 		super(props);
 	}
@@ -19,8 +19,7 @@ export class FieldsList extends React.Component {
 		this.props.onAddressesChange(addresses);
 	}
 
-	onRemoveButtonClick(target) {
-		const value = target.value;
+	onRemoveButtonClick(value) {
 		const addresses = this.props.addresses.slice(0);
 		const index = addresses.indexOf(value);
 
@@ -33,22 +32,22 @@ export class FieldsList extends React.Component {
 	}
 
 	render() {
-		const inputs = [];
-		const count = this.props.addresses.length;
-
-		for (let i = 0; i < count + 1; i++) {
-			inputs.push(
-				<FieldBlock
-					key={i}
-					order={i + 1}
-					ref={'fieldBlock' + (i + 1)}
-					onChange={event => this.onFieldChange(event, i)}
-					value={this.props.addresses[i]}
-					onRemoveButtonClick={this.onRemoveButtonClick.bind(this)}
-				/>
-			);
-		}
-
-		return <div>{inputs}</div>;
+		const fieldsToShow = this.props.addresses.slice(0).concat(['']);
+		return (
+			<>
+				{fieldsToShow.map((value, index) => (
+					<FieldBlock
+						key={index}
+						order={index + 1}
+						ref={'fieldBlock' + (index + 1)}
+						onChange={event => this.onFieldChange(event, index)}
+						value={value}
+						onRemoveButtonClick={value => this.onRemoveButtonClick(value)}
+					/>
+				))}
+			</>
+		);
 	}
 }
+
+export default FieldsList;

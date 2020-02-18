@@ -1,6 +1,7 @@
 /* globals ymaps */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const DURATION_MILTIPLIER = 1 / 2;
 
@@ -9,13 +10,9 @@ function getPrettyDuration(durationValueRaw) {
 	return '~ ' + Math.round(duration / 60) + ' мин';
 }
 
-export class Map extends React.Component {
+class Map extends React.Component {
 	constructor(props) {
 		super(props);
-
-		$.getScript('https://api-maps.yandex.ru/2.1/?apikey=b1838d93-47fb-47bb-b837-89ef1dad64f7&lang=ru_RU', () =>
-			this.init()
-		);
 	}
 
 	init() {
@@ -34,6 +31,12 @@ export class Map extends React.Component {
 
 			this.update();
 		});
+	}
+
+	componentDidMount() {
+		$.getScript('https://api-maps.yandex.ru/2.1/?apikey=b1838d93-47fb-47bb-b837-89ef1dad64f7&lang=ru_RU', () =>
+			this.init()
+		);
 	}
 
 	update() {
@@ -187,9 +190,7 @@ export class Map extends React.Component {
 					let pathAddressEnd = this._getAddressByCoords(pathCoords[pathCoords.length - 1]);
 
 					text.push(
-						`<br><i>${pathAddressStart.name} (${pathAddressStart.orderEntered}) → ${pathAddressEnd.name} (${
-							pathAddressEnd.orderEntered
-						})</i>`
+						`<br><i>${pathAddressStart.name} (${pathAddressStart.orderEntered}) → ${pathAddressEnd.name} (${pathAddressEnd.orderEntered})</i>`
 					);
 					text.push(`<i>Длина участка: ${path.properties.get('distance').text}</i>`);
 					text.push(
@@ -264,3 +265,9 @@ export class Map extends React.Component {
 		);
 	}
 }
+
+Map.propTypes = {
+	addresses: PropTypes.array,
+};
+
+export default Map;

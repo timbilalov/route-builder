@@ -1,6 +1,6 @@
 import React from 'react';
 
-export class FieldBlock extends React.Component {
+class FieldBlock extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -24,10 +24,18 @@ export class FieldBlock extends React.Component {
 			<div className="input-block">
 				<small data-order-entered>{this.props.order}</small>
 				<input type="text" onChange={event => this.onChange(event)} value={this.state.value} ref="input" />
-				<button onClick={() => this.props.onRemoveButtonClick(this.refs.input)} tabIndex="-1">
+				<button onClick={() => this.props.onRemoveButtonClick(this.refs.input.value)} tabIndex="-1">
 					x
 				</button>
 			</div>
 		);
 	}
 }
+
+FieldBlock.defaultProps = {
+	onRemoveButtonClick: () => {},
+	onChange: () => {},
+	order: '',
+};
+
+export default FieldBlock;

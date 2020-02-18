@@ -1,7 +1,7 @@
 import React from 'react';
-import { FieldsList } from './containers/FieldsList';
-import { Map } from './containers/Map';
-import { Controls } from './containers/Controls';
+import FieldsList from './containers/FieldsList';
+import Map from './containers/Map';
+import Controls from './containers/Controls';
 import LocalStorage from './components/LocalStorage';
 import Utils from './utils/Utils';
 

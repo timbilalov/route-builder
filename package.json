@@ -72,6 +72,7 @@
   "postcss-sprites": "^4.2.1",
   "prettier": "^1.19.1",
   "pretty-quick": "^2.0.1",
+  "prop-types": "^15.7.2",
   "raw-loader": "^4.0.0",
   "vinyl-named": "^1.1.0",
   "webpack": "^4.41.6",
