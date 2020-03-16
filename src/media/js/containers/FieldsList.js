@@ -1,53 +1,57 @@
 import React from 'react';
 import FieldBlock from '../components/FieldBlock';
+import store from '../store';
+import { addAddress, editAddress, removeAddress } from '../store/actions';
+import { connect } from 'react-redux';
 
 class FieldsList extends React.Component {
-	constructor(props) {
-		super(props);
-	}
+	static defaultProps = {
+		addresses: [],
+	};
 
-	onFieldChange(event, index) {
-		const value = event.target.value;
-		const addresses = this.props.addresses.slice(0);
+	onFieldChange(value, index) {
+		const { addresses } = this.props;
+		const existingAddress = addresses[index];
 
-		if (value) {
-			addresses[index] = value;
+		if (existingAddress) {
+			store.dispatch(editAddress(existingAddress, value));
 		} else {
-			addresses.splice(index, 1);
+			store.dispatch(addAddress(value));
 		}
-
-		this.props.onAddressesChange(addresses);
 	}
 
 	onRemoveButtonClick(value) {
-		const addresses = this.props.addresses.slice(0);
-		const index = addresses.indexOf(value);
-
-		if (index === -1) {
-			return;
-		}
-
-		addresses.splice(index, 1);
-		this.props.onAddressesChange(addresses, true);
+		store.dispatch(removeAddress(value));
 	}
 
 	render() {
-		const fieldsToShow = this.props.addresses.slice(0).concat(['']);
+		const { addresses } = this.props;
+		const fieldsToShow = addresses.slice(0).concat(['']);
+
 		return (
 			<>
-				{fieldsToShow.map((value, index) => (
-					<FieldBlock
-						key={index}
-						order={index + 1}
-						ref={'fieldBlock' + (index + 1)}
-						onChange={event => this.onFieldChange(event, index)}
-						value={value}
-						onRemoveButtonClick={value => this.onRemoveButtonClick(value)}
-					/>
-				))}
+				{fieldsToShow.map((value, index) => {
+					const randomKey = `field-input-${Math.round(Math.random() * 1000000)}`;
+
+					return (
+						<FieldBlock
+							key={randomKey}
+							order={index + 1}
+							onChange={value => this.onFieldChange(value, index)}
+							defaultValue={value}
+							onRemoveButtonClick={value => this.onRemoveButtonClick(value)}
+						/>
+					);
+				})}
 			</>
 		);
 	}
 }
 
-export default FieldsList;
+const mapStateToProps = function(state) {
+	return {
+		addresses: state.addresses,
+	};
+};
+
+export default connect(mapStateToProps)(FieldsList);

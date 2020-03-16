@@ -2,6 +2,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
 const DURATION_MILTIPLIER = 1 / 2;
 
@@ -270,4 +271,10 @@ Map.propTypes = {
 	addresses: PropTypes.array,
 };
 
-export default Map;
+const mapStateToProps = function(state) {
+	return {
+		addresses: state.addresses,
+	};
+};
+
+export default connect(mapStateToProps)(Map);

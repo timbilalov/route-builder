@@ -1,29 +1,42 @@
 import React from 'react';
+import Utils from 'utils/Utils';
 
 class FieldBlock extends React.Component {
-	constructor(props) {
-		super(props);
+	state = {
+		value: this.props.defaultValue,
+	};
 
-		this.state = {
-			value: this.props.value || '',
-		};
-	}
+	static defaultProps = {
+		defaultValue: '',
+		onRemoveButtonClick: () => {},
+		onChange: () => {},
+		order: '',
+	};
 
-	onChange(event) {
-		const value = event.target.value || this.props.value;
-
+	onChange(value) {
 		this.setState({
 			value,
 		});
 
-		this.props.onChange(event);
+		this.onChangeDebounced(value);
+	}
+
+	componentDidMount() {
+		this.onChangeDebounced = Utils.debounce(value => {
+			this.props.onChange(value);
+		}, 1000);
 	}
 
 	render() {
 		return (
 			<div className="input-block">
 				<small data-order-entered>{this.props.order}</small>
-				<input type="text" onChange={event => this.onChange(event)} value={this.state.value} ref="input" />
+				<input
+					type="text"
+					onChange={event => this.onChange(event.target.value)}
+					value={this.state.value}
+					ref="input"
+				/>
 				<button onClick={() => this.props.onRemoveButtonClick(this.refs.input.value)} tabIndex="-1">
 					x
 				</button>
@@ -31,11 +44,5 @@ class FieldBlock extends React.Component {
 		);
 	}
 }
-
-FieldBlock.defaultProps = {
-	onRemoveButtonClick: () => {},
-	onChange: () => {},
-	order: '',
-};
 
 export default FieldBlock;

@@ -1,9 +1,12 @@
 import React from 'react';
 import ClearAddressesControl from '../components/ClearAddressesControl';
+import store from '../store';
+import { clearAddresses } from '../store/actions';
+import { connect } from 'react-redux';
 
 class Controls extends React.Component {
-	constructor(props) {
-		super(props);
+	onAddressesClear() {
+		store.dispatch(clearAddresses());
 	}
 
 	render() {
@@ -11,7 +14,7 @@ class Controls extends React.Component {
 			<div className="controls">
 				{this.props.addresses.length > 0 ? (
 					<div>
-						<ClearAddressesControl onClick={this.props.onAddressesClear} />
+						<ClearAddressesControl onClick={this.onAddressesClear} />
 					</div>
 				) : (
 					<></>
@@ -21,8 +24,10 @@ class Controls extends React.Component {
 	}
 }
 
-Controls.defaultProps = {
-	onAddressesClear: () => {},
+const mapStateToProps = function(state) {
+	return {
+		addresses: state.addresses,
+	};
 };
 
-export default Controls;
+export default connect(mapStateToProps)(Controls);

@@ -1,23 +1,36 @@
-const STORAGE_KEY = 'route-builder-state';
+const ITEMS_PREFIX = 'route-builder-';
 const DEFAULT_ERROR_MESSAGE = 'Error with localStorage';
 
 class LocalStorage {
-	getState() {
-		let state = null;
+	getItem(name, needToParseJSON = true) {
+		const key = ITEMS_PREFIX + name;
+		let value;
+
 		try {
-			state = JSON.parse(localStorage.getItem(STORAGE_KEY));
+			value = localStorage.getItem(key);
+			if (needToParseJSON) {
+				value = JSON.parse(value);
+			}
 		} catch (error) {
 			console.error(`${DEFAULT_ERROR_MESSAGE}:`, error);
 		}
-		return state;
+
+		return value;
 	}
 
-	setState(state) {
+	setItem(name, value, needToStringify = true) {
+		const key = ITEMS_PREFIX + name;
+		const valueToSet = needToStringify ? JSON.stringify(value) : value;
+		let isSuccess = false;
+
 		try {
-			localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+			localStorage.setItem(key, valueToSet);
+			isSuccess = true;
 		} catch (error) {
 			console.error(`${DEFAULT_ERROR_MESSAGE}:`, error);
 		}
+
+		return isSuccess;
 	}
 }
 

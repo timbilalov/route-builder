@@ -1,4 +1,6 @@
 import * as React from 'react'; // eslint disable no-unused-vars
+import { Provider } from 'react-redux';
+import store from './store';
 import ReactDOM from 'react-dom';
 import ReactApp from './App';
 
@@ -20,7 +22,12 @@ const App = new function App() { // eslint-disable-line
 		};
 	});
 
-	ReactDOM.render(<ReactApp />, document.getElementById('react-app'));
+	ReactDOM.render(
+		<Provider store={store}>
+			<ReactApp />
+		</Provider>,
+		document.getElementById('react-app')
+	);
 }();
 
 // App → ProjectName
