@@ -9,15 +9,12 @@ export default function addresses(state = savedAddresses || [], action) {
 
 	switch (type) {
 		case SET_ADDRESSES: {
-			const { addresses } = action;
-			const newState = [...addresses];
-
-			return newState;
+			return [...action.addresses];
 		}
 
 		case ADD_ADDRESS: {
 			const { address } = action;
-			const newState = state.slice(0);
+			const newState = Array.from(state);
 
 			newState.push(address);
 
@@ -26,12 +23,13 @@ export default function addresses(state = savedAddresses || [], action) {
 
 		case EDIT_ADDRESS: {
 			const { currentAddress, newAddress } = action;
-			const newState = state.slice(0);
-			const currentAddressIndex = newState.indexOf(currentAddress);
+			const currentAddressIndex = state.indexOf(currentAddress);
 
 			if (currentAddressIndex === -1) {
 				return state;
 			}
+
+			const newState = Array.from(state);
 			newState[currentAddressIndex] = newAddress;
 
 			return newState;
@@ -39,12 +37,13 @@ export default function addresses(state = savedAddresses || [], action) {
 
 		case REMOVE_ADDRESS: {
 			const { address } = action;
-			const newState = state.slice(0);
-			const addressIndex = newState.indexOf(address);
+			const addressIndex = state.indexOf(address);
 
 			if (addressIndex === -1) {
 				return state;
 			}
+
+			const newState = Array.from(state);
 			newState.splice(addressIndex, 1);
 
 			return newState;

@@ -1,6 +1,6 @@
 import React from 'react';
 import FieldsList from './containers/FieldsList';
-import Map from './containers/Map';
+import Map from './containers/Map/Map';
 import Controls from './containers/Controls';
 import { connect } from 'react-redux';
 import LocalStorage from './components/LocalStorage';
