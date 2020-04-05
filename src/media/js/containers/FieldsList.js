@@ -10,13 +10,6 @@ class FieldsList extends React.Component {
 		addresses: [],
 	};
 
-	// constructor() {
-	// 	super();
-	// 	const tt = new VoiceInput();
-	// 	this.tt = tt;
-	// 	window.tt = tt;
-	// }
-
 	onFieldChange(value, index) {
 		const { addresses } = this.props;
 		const existingAddress = addresses[index];
@@ -51,8 +44,6 @@ class FieldsList extends React.Component {
 						/>
 					);
 				})}
-
-				<hr/>
 
 				<VoiceInput />
 			</>

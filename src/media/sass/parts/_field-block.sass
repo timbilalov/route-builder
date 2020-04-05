@@ -1,0 +1,35 @@
+.field-block
+	margin-bottom: 10px
+	&:last-child
+		margin-bottom: 0
+	&__container
+		position: relative
+		display: inline-flex
+	&__input
+		display: block
+		width: 100%
+		max-width: 250px
+		padding: 10px 20px 10px 40px;
+		border-radius: $default-border-radius
+		border: 1px solid $c-gray-lines;
+	&__number-entered
+		@extend %centered-flex
+		$size: 24px
+		$border-size: 2px
+		position: absolute
+		left: 8px
+		top: 50%
+		margin-top: -$size / 2
+		box-sizing: border-box
+		border-radius: 100%
+		width: $size
+		height: $size
+		border: $border-size solid $c-accent-2
+		font-weight: bold
+		text-align: center
+	&__button
+		min-width: 0
+		margin-left: 10px
+		padding-top: 0
+		padding-bottom: 0
+
