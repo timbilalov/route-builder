@@ -1,0 +1,21 @@
+%button-base
+	display: inline-block
+	box-sizing: border-box
+	background: $c-accent
+	color: $c-text-invert
+	outline: none
+	border: none
+	user-select: none
+	text-align: center
+	line-height: 1
+	transition: color $default-transition-duration, background-color $default-transition-duration
+	cursor: pointer
+	&:hover
+		background-color: $c-accent-hover
+		transition: none
+
+.button
+	@extend %button-base
+	padding: 10px 20px
+	min-width: 150px
+	border-radius: 4px
