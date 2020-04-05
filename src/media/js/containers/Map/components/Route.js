@@ -11,19 +11,17 @@ class Route extends React.Component {
 		const mapCenter = map.getCenter();
 		const routePaths = route.getPaths();
 		const distance = route.properties.get('distance');
-		const duration = route.properties.get('duration');
 
 		return (
 			<div>
 				<div><b>Вариант маршрута №{num}</b></div>
 				<div>Порядок адресов: {orderSortedArr.join(', ')}</div>
 				<div>Длина маршрута: {distance.text}</div>
-				<div>Длительность маршрута: {getPrettyDuration(duration.value)}</div>
+				<div>Длительность маршрута: {getPrettyDuration(distance.value)}</div>
 				<div>Маршрут состоит из {routePaths.length} участков:</div>
 
 				{routePaths.map((path, index) => {
 					const distance = path.properties.get('distance');
-					const duration = path.properties.get('duration');
 					const coordinates = path.properties.get('coordinates');
 					const addresses = {
 						start: sorted[index],
@@ -33,7 +31,6 @@ class Route extends React.Component {
 					const params = {
 						index,
 						distance,
-						duration,
 						coordinates,
 						addresses,
 						mapCenter,

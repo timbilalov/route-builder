@@ -10,7 +10,6 @@ class RouteStep extends React.Component {
 			coordinates,
 			addresses,
 			distance,
-			duration,
 		} = params;
 
 		const pathHrefParts = [];
@@ -40,7 +39,7 @@ class RouteStep extends React.Component {
 					<i>Длина участка: {distance.text}</i>
 				</div>
 				<div>
-					<i>Длительность участка: {getPrettyDuration(duration.value)}</i>
+					<i>Длительность участка: {getPrettyDuration(distance.value)}</i>
 				</div>
 				<div>
 					<i><a href={pathHref} target="_blank" rel="nofollow noopener noreferrer">Навигация по участку</a></i>
