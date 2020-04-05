@@ -6,7 +6,10 @@ import Route from './components/Route';
 
 class Map extends React.Component {
 	state = {
-		descriptionHTML: '',
+		navigationLinks: {
+			variant1: false,
+			variant2: false,
+		},
 		routes: [],
 	};
 
@@ -26,8 +29,6 @@ class Map extends React.Component {
 
 	init() {
 		const options = this.mapInitialOptions;
-
-		console.log('cache', Object.assign({}, this.addressesCache));
 
 		ymaps.ready(() => {
 			this.ymap = new ymaps.Map('map', {
@@ -105,36 +106,17 @@ class Map extends React.Component {
 		});
 	}
 
-	_getAddressByCoords(coords) {
-		const { recognized } = this.addressesCache;
-
-		if (!recognized || !recognized.length) {
-			return false;
-		}
-
-		let res = false;
-		let tolerance = 0.0004;
-		for (let i = 0; i < recognized.length; i++) {
-			let address = recognized[i];
-			let addressCoords = address.coords;
-			if (
-				Math.abs(addressCoords[0] - coords[0]) <= tolerance &&
-				Math.abs(addressCoords[1] - coords[1]) <= tolerance
-			) {
-				res = address;
-			}
-		}
-		return res;
-	}
-
 	clearMap() {
 		this.setState({
-			descriptionHTML: '',
+			navigationLinks: {
+				variant1: false,
+				variant2: false,
+			},
 		});
 		this.ymap && this.ymap.geoObjects.removeAll();
 	}
 
-	_initMultiRoute(sorted) {
+	buildMultiRoute(sorted) {
 		const points = sorted.map(item => item.geoObject);
 
 		const multiRoute = new ymaps.multiRouter.MultiRoute(
@@ -170,6 +152,7 @@ class Map extends React.Component {
 			}
 
 			const allRoutes = multiRoute.model.getRoutes();
+			const { href1, href2 } = this.getNavigationLinks(sorted);
 			const routes = allRoutes.map((route, index) => {
 				return {
 					num: index + 1,
@@ -180,60 +163,57 @@ class Map extends React.Component {
 
 			this.setState({
 				routes,
-			});
-
-			let resText = '';
-			let coordinates = points.slice(0).map(el => el.geometry._coordinates);
-
-			let hrefParts = [];
-			hrefParts.push(`z=${this.mapInitialOptions.zoom}`);
-			hrefParts.push(
-				`ll=` +
-					this.mapInitialOptions.center
-						.slice(0)
-						.reverse()
-						.join(',')
-			);
-			hrefParts.push(`l=map`);
-			hrefParts.push('rtext=' + coordinates.map(el => `${el[0]},${el[1]}`).join('~'));
-			hrefParts.push(`rtn=0`);
-			hrefParts.push(`rtt=pd`);
-			hrefParts.push(`rtm=atm`);
-			hrefParts.push(`origin=jsapi_2_1_72`);
-			hrefParts.push(`from=api-maps`);
-			hrefParts.push(`mode=routes`);
-
-			let hrefParts2 = [];
-			hrefParts2.push(`lat_from=${coordinates[0][0]}&lon_from=${coordinates[0][1]}`);
-			hrefParts2.push(
-				`lat_to=${coordinates[coordinates.length - 1][0]}&lon_to=${coordinates[coordinates.length - 1][1]}`
-			);
-			if (coordinates.length > 2) {
-				let coordinatesVia = coordinates.slice(1, coordinates.length - 1);
-				for (let j = 0; j < coordinatesVia.length; j++) {
-					hrefParts2.push(`lat_via_${j}=${coordinatesVia[j][0]}&lon_via_${j}=${coordinatesVia[j][1]}`);
-				}
-			}
-			hrefParts2.push(`rtt=pd`);
-
-			let resHref = hrefParts.join('&');
-			let resHref2 = hrefParts2.join('&');
-			let href = `https://yandex.ru/maps/?${resHref}`;
-			let href2 = `yandexmaps://build_route_on_map?${resHref2}`;
-			resText += `<br><br><a href="${href}" target="_blank" rel="nofollow">Общая навигация (вариант 1)</a>`;
-			resText += `<br><a href="${href2}" target="_blank" rel="nofollow">Общая навигация (вариант 2)</a>`;
-
-			this.setState({
-				descriptionHTML: resText,
+				navigationLinks: {
+					variant1: href1,
+					variant2: href2,
+				},
 			});
 		});
 
-		// Добавление маршрута на карту.
 		this.ymap.geoObjects.add(multiRoute);
 	}
 
-	componentDidUpdate() {
-		this.update();
+	getNavigationLinks(sorted) {
+		const coordinates = Array.from(sorted).map(item => item.coords);
+
+		const hrefParts = [];
+		hrefParts.push(`z=${this.mapInitialOptions.zoom}`);
+		hrefParts.push(
+			`ll=` +
+			this.mapInitialOptions.center
+				.slice(0)
+				.reverse()
+				.join(',')
+		);
+		hrefParts.push(`l=map`);
+		hrefParts.push('rtext=' + coordinates.map(el => `${el[0]},${el[1]}`).join('~'));
+		hrefParts.push(`rtn=0`);
+		hrefParts.push(`rtt=pd`);
+		hrefParts.push(`rtm=atm`);
+		hrefParts.push(`origin=jsapi_2_1_72`);
+		hrefParts.push(`from=api-maps`);
+		hrefParts.push(`mode=routes`);
+
+		const hrefParts2 = [];
+		hrefParts2.push(`lat_from=${coordinates[0][0]}&lon_from=${coordinates[0][1]}`);
+		hrefParts2.push(
+			`lat_to=${coordinates[coordinates.length - 1][0]}&lon_to=${coordinates[coordinates.length - 1][1]}`
+		);
+		if (coordinates.length > 2) {
+			let coordinatesVia = coordinates.slice(1, coordinates.length - 1);
+			for (let j = 0; j < coordinatesVia.length; j++) {
+				hrefParts2.push(`lat_via_${j}=${coordinatesVia[j][0]}&lon_via_${j}=${coordinatesVia[j][1]}`);
+			}
+		}
+		hrefParts2.push(`rtt=pd`);
+
+		const href1 = `https://yandex.ru/maps/?${hrefParts.join('&')}`;
+		const href2 = `yandexmaps://build_route_on_map?${hrefParts2.join('&')}`;
+
+		return {
+			href1,
+			href2,
+		};
 	}
 
 	async update() {
@@ -248,17 +228,30 @@ class Map extends React.Component {
 		const sorted = await this.sortAddresses(geocoded);
 		console.log('sorted', sorted);
 
-		// TODO
-		this._initMultiRoute(sorted);
+		this.buildMultiRoute(sorted);
+		console.log('multiroute builded', sorted);
+	}
+
+	componentDidUpdate() {
+		this.update();
 	}
 
 	render() {
-		const {routes} = this.state;
+		const { routes, navigationLinks } = this.state;
 
 		return (
 			<div>
 				<div id="map" className="map" />
-				<div className="description" dangerouslySetInnerHTML={{__html: this.state.descriptionHTML}}></div>
+				{navigationLinks && navigationLinks.variant1 && navigationLinks.variant2 &&
+					<div className="description">
+						<div>
+							<a href={navigationLinks.variant1} target="_blank" rel="nofollow noopener noreferrer">Общая навигация (вариант 1)</a>
+						</div>
+						<div>
+							<a href={navigationLinks.variant2} target="_blank" rel="nofollow noopener noreferrer">Общая навигация (вариант 2)</a>
+						</div>
+					</div>
+				}
 				{routes.map((routeData, index) => {
 					return (
 						<Route key={index} data={routeData} map={this.ymap} />
