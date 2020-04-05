@@ -37,13 +37,22 @@ class VoiceInput extends React.Component {
 			this.setState({
 				isRecording: true,
 			});
+
+			this.setState({
+				log: 'recognition.onstart',
+			});
 		};
 
 		recognition.onerror = event => {
 			this.setState({
-				isError: true,
+				errorMessage: `Recognition error: ${JSON.stringify(event.error)}`,
 			});
-			console.warn('recognition onerror: ' + event.error);
+
+			setTimeout(() => {
+				this.setState({
+					errorMessage: '',
+				});
+			}, 2000);
 		};
 
 		recognition.onend = () => {
@@ -53,10 +62,18 @@ class VoiceInput extends React.Component {
 
 			this.onResult(this.recognizedString);
 			this.recognizedString = '';
+
+			// this.setState({
+			// 	log: 'recognition.onend',
+			// });
 		};
 
 		recognition.onresult = event => {
 			this.recognizedString = Array.from(event.results).slice(event.resultIndex).map(elem => elem[0] ? elem[0].transcript : '').join(' ');
+
+			this.setState({
+				log: 'recognition.onresult',
+			});
 		};
 
 		this.recognition = recognition;
@@ -102,7 +119,7 @@ class VoiceInput extends React.Component {
 	}
 
 	render() {
-		const { isRecording } = this.state;
+		const { isRecording, errorMessage } = this.state;
 
 		return (
 			<div className="voice-input">
@@ -112,6 +129,10 @@ class VoiceInput extends React.Component {
 				>
 					<SvgIcon name="voice-record" />
 				</span>
+
+				{errorMessage &&
+					<div className="voice-input__error">{errorMessage}</div>
+				}
 			</div>
 		);
 	}
