@@ -3,11 +3,19 @@ import FieldBlock from '../components/FieldBlock';
 import store from '../store';
 import { addAddress, editAddress, removeAddress } from '../store/actions';
 import { connect } from 'react-redux';
+import VoiceInput from '../components/VoiceInput';
 
 class FieldsList extends React.Component {
 	static defaultProps = {
 		addresses: [],
 	};
+
+	// constructor() {
+	// 	super();
+	// 	const tt = new VoiceInput();
+	// 	this.tt = tt;
+	// 	window.tt = tt;
+	// }
 
 	onFieldChange(value, index) {
 		const { addresses } = this.props;
@@ -43,6 +51,10 @@ class FieldsList extends React.Component {
 						/>
 					);
 				})}
+
+				<hr/>
+
+				<VoiceInput />
 			</>
 		);
 	}
