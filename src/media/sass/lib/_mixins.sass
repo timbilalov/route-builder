@@ -36,7 +36,7 @@
 	overflow: hidden
 	text-overflow: ellipsis
 	white-space: nowrap
-	
+
 =letterSpacing($interval)
 	letter-spacing: unquote(($interval / 1000) + 'em')
 
@@ -186,7 +186,7 @@
 			vertical-align: middle
 			height: 100%
 			width: 0
-	
+
 =loading
 	@at-root html._loading #{&}
 		@content
@@ -198,19 +198,62 @@
 =windows
 	@at-root html._win #{&}
 		@content
-	
+
 =desktop
 	@at-root html._desktop #{&}
 		@content
-	
+
 =mobile
 	@at-root html._mobile #{&}
 		@content
-	
+
 =tablet
 	@at-root html._tablet #{&}
 		@content
-	
+
 =phone
 	@at-root html._phone #{&}
 		@content
+
+// Aspect-ratio blocks.
+// Stealed from here:
+// https://github.com/timbilalov/aspect-ratio
+
+// Original version
+=aspect-ratio($w, $h, $position: false, $childSelector: false)
+	@if $position != false
+		position: $position
+	$pt: percentage($h / $w)
+
+	&:before
+		display: block
+		content: ""
+		width: 100%
+		padding-top: $pt
+
+	@if $childSelector != false
+		#{$childSelector}
+			@extend %full-sized
+
+// Updated version
+=aspect-ratio--upd($w, $h: $w, $childSelector: false)
+	$pt: percentage($h / $w)
+	padding-top: $pt
+
+	@if $childSelector != false
+		#{$childSelector}
+			margin-top: (- $pt)
+
+=centered($width, $height: $width)
+	@if $width and $height
+		width: $width
+		height: $height
+		position: absolute
+		@if unit($width) == "%" and unit($height) == "%"
+			left: (100% - $width) / 2
+			top: (100% - $height) / 2
+		@else
+			left: 50%
+			top: 50%
+			margin-left: -$width / 2
+			margin-top: -$height / 2

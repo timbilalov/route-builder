@@ -1,27 +1,34 @@
-import { TweenMax } from 'gsap';
-global.TweenMax = TweenMax;
+import * as React from 'react'; // eslint disable no-unused-vars
+import { Provider } from 'react-redux';
+import store from './store';
+import ReactDOM from 'react-dom';
+import ReactApp from './App';
+
 global.$ = global.jQuery = require('jquery');
 require('./utils/jqExtensions');
 
+global.RB && window.location.reload();
+
 // prettier-ignore
-global.ProjectName = new function ProjectName() { // eslint-disable-line
-	this.env = require('./utils/ENV');
-	this.dom = require('./utils/DOM');
-	this.utils = require('./utils/Utils');
-
-	this.classes = {
-		Callback: require('./classes/Callback')
-	};
-
-	this.helpers = {};
-	this.modules = {};
-
+const App = new function App() { // eslint-disable-line
 	// Startup
 	$(() => {
-		// Remove _loading modificator
-		this.dom.$html.removeClass('_loading');
+		this.dom = require('./utils/DOM');
+		this.env = require('./utils/ENV');
+		this.modules = {
+		};
 	});
+
+	ReactDOM.render(
+		<Provider store={store}>
+			<ReactApp />
+		</Provider>,
+		document.getElementById('react-app')
+	);
 }();
+
+// App → ProjectName
+(global.RB = global.App = App), delete global.App; //eslint-disable-line
 
 if (module.hot) {
 	module.hot.accept();

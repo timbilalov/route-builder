@@ -1,12 +1,17 @@
 {
 	"parser": "babel-eslint",
+	"parserOptions": {
+		"ecmaFeatures": {
+			"jsx": true
+		}
+	},
 	"env": {
 		"browser": true,
 		"es6": true,
 		"jquery": true,
 		"commonjs": true
 	},
-	"extends": ["eslint:recommended", "prettier", "gsap"],
+	"extends": ["eslint:recommended", "prettier", "plugin:react/recommended"],
 	"globals": {
 		"cy": true
 	},
@@ -15,7 +20,14 @@
 		"no-class-assign": "off",
 		"import/no-named-as-default": "off",
 		"no-console": "off",
-		"no-unused-vars": "warn"
+		"no-unused-vars": "warn",
+		"react/no-string-refs": 0,
+		"react/prop-types": 0
 	},
-	"plugins": ["prettier"]
+	"plugins": ["prettier", "react"],
+	"settings": {
+		"react": {
+			"version": "detect"
+		}
+	}
 }

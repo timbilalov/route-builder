@@ -16,9 +16,6 @@ export default function images() {
 				imagemin(
 					[
 						pngquant(),
-						imagemin.jpegtran({
-							progressive: true,
-						}),
 						imageminMozjpeg({
 							quality: 80,
 						}),

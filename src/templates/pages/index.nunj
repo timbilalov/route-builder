@@ -3,6 +3,7 @@
 
 {% block content %}
 	<div class="container clearfix">
-		<h1>Route Builder</h1>
+		<h1>Route Builder (React)</h1>
+		<div id="react-app"></div>
 	</div>
 {% endblock content %}

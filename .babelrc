@@ -7,6 +7,9 @@
 					"browsers": ["last 2 versions", "ie 10"]
 				}
 			}
+		],
+		[
+			"@babel/preset-react"
 		]
 	],
 	"plugins": [
@@ -14,6 +17,12 @@
 			"@babel/plugin-proposal-object-rest-spread",
 			{
 				"useBuiltIns": true
+			}
+		],
+		[
+			"@babel/plugin-proposal-class-properties",
+			{
+				"loose": true
 			}
 		],
 		[
