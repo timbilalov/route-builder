@@ -4,13 +4,21 @@ import React from 'react';
 import { connect } from 'react-redux';
 import Route from './components/Route';
 
+const SHOW_DIFFERENT_CALC_VARIANTS = true;
+
 class Map extends React.Component {
+	availableCalcVariants = [
+		'minRouteDistance',
+		'nearestPoint',
+	];
+
 	state = {
 		navigationLinks: {
 			variant1: false,
 			variant2: false,
 		},
 		routes: [],
+		calcVariant: this.availableCalcVariants[0],
 	};
 
 	addressesCache = {
@@ -52,8 +60,6 @@ class Map extends React.Component {
 	}
 
 	async geocodeAddresses(addresses = this.props.addresses) {
-		this.clearMap();
-
 		if (addresses.length < 2) {
 			return;
 		}
@@ -74,7 +80,7 @@ class Map extends React.Component {
 						const recognized = {
 							name: addressEntered,
 							orderEntered: i + 1,
-							coords: geoObject.geometry.getCoordinates(),
+							coordinates: geoObject.geometry.getCoordinates(),
 							geoObject,
 						};
 
@@ -89,20 +95,120 @@ class Map extends React.Component {
 		return Promise.all(promisesArray);
 	}
 
+	// https://en.wikipedia.org/wiki/Permutation
+	// https://en.wikipedia.org/wiki/Heap%27s_algorithm
+	// https://stackoverflow.com/questions/40598891/heaps-algorithm-walk-through
+	// http://ruslanledesma.com/2016/06/17/why-does-heap-work.html
+	findAllPermutations(length) {
+		const permutations = [];
+
+		function generate(n, array) {
+			array = Array.from(array);
+
+			if (n === 1) {
+				permutations.push(array);
+			} else {
+				for (var i = 0; i < n - 1; i++) {
+					generate(n - 1, array);
+
+					if (n % 2 === 0) {
+						const one = array[i];
+						const two = array[n - 1];
+
+						array[i] = two;
+						array[n - 1] = one;
+					} else {
+						const first = array[0];
+						const second = array[n - 1];
+
+						array[0] = second;
+						array[n - 1] = first;
+					}
+				}
+
+				generate(n - 1, array);
+			}
+		}
+
+		generate(length, Array.from(new Array(length)).map((el, index) => index + 1));
+
+		return permutations;
+	}
+
+	getDistanceBetweenCoordinates(c1, c2) {
+		const mult = 1000;
+		return Math.sqrt(Math.pow(Math.abs(c1[0] * mult - c2[0] * mult), 2) + Math.pow(Math.abs(c1[1] * mult - c2[1] * mult), 2));
+	}
+
+	findMinRouteDistance(availableRouteVariants, coordinates) {
+		const getDistance = this.getDistanceBetweenCoordinates;
+
+		let minDistance = Infinity;
+		let minVariant;
+
+		for (let i = 0; i < availableRouteVariants.length; i++) {
+			const variant = availableRouteVariants[i];
+			const variantDistance = variant
+				.map(index => coordinates[index]).reduce((prev, current, i) => {
+					const nextPrev = current;
+					let distance;
+
+					if (i === 1) {
+						distance = getDistance(prev, current);
+					} else {
+						distance = prev.distance + getDistance(prev.prev, current);
+					}
+
+					if (i < variant.length - 1) {
+						return {
+							distance: distance,
+							prev: nextPrev,
+						};
+					} else {
+						return distance;
+					}
+				});
+
+			if (variantDistance < minDistance) {
+				minDistance = variantDistance;
+				minVariant = variant;
+			}
+		}
+
+		return minVariant;
+	}
+
+	onCalcVariantChange(variant) {
+		this.setState({
+			calcVariant: variant,
+		});
+		this.update(true);
+	}
+
 	async sortAddresses(geocoded) {
 		const geoObjects = geocoded.map(item => item.geoObject);
+		const { calcVariant } = this.state;
+		const { availableCalcVariants } = this;
 
 		return new Promise(resolve => {
-			const query	= ymaps.geoQuery(geoObjects.slice(1)).sortByDistance(geoObjects[0]);
+			if (calcVariant === availableCalcVariants[0]) {
+				const coordinates = geocoded.map(item => item.coordinates);
+				const availableRouteVariants = this.findAllPermutations(geocoded.length - 1).map(el => [0].concat(el));
+				const routeByMinDistance = this.findMinRouteDistance(availableRouteVariants, coordinates);
 
-			query.then(() => {
-				const firstAddressObject = this.getRecognizedAddress('geoObject', geoObjects[0]);
-				const otherAddressObjects = [];
-				query.each(r => otherAddressObjects.push(this.getRecognizedAddress('geoObject', r)));
-				const sorted = [firstAddressObject].concat(otherAddressObjects);
-
+				const sorted = routeByMinDistance.map(index => geocoded[index]);
 				resolve(sorted);
-			});
+			} else {
+				const query	= ymaps.geoQuery(geoObjects.slice(1)).sortByDistance(geoObjects[0]);
+				query.then(() => {
+					const firstAddressObject = this.getRecognizedAddress('geoObject', geoObjects[0]);
+					const otherAddressObjects = [];
+					query.each(r => otherAddressObjects.push(this.getRecognizedAddress('geoObject', r)));
+
+					const sorted = [firstAddressObject].concat(otherAddressObjects);
+					resolve(sorted);
+				});
+			}
 		});
 	}
 
@@ -174,7 +280,7 @@ class Map extends React.Component {
 	}
 
 	getNavigationLinks(sorted) {
-		const coordinates = Array.from(sorted).map(item => item.coords);
+		const coordinates = Array.from(sorted).map(item => item.coordinates);
 
 		const hrefParts = [];
 		hrefParts.push(`z=${this.mapInitialOptions.zoom}`);
@@ -216,12 +322,14 @@ class Map extends React.Component {
 		};
 	}
 
-	async update() {
+	async update(forced = false) {
 		const { addresses } = this.props;
-		if (JSON.stringify(addresses) === JSON.stringify(this.addressesCache.lastCalculated)) {
+		if (!forced && JSON.stringify(addresses) === JSON.stringify(this.addressesCache.lastCalculated)) {
 			return;
 		}
 		this.addressesCache.lastCalculated = Array.from(addresses);
+
+		this.clearMap();
 
 		const geocoded = await this.geocodeAddresses(addresses);
 		console.log('geocoded', geocoded);
@@ -242,6 +350,20 @@ class Map extends React.Component {
 		return (
 			<div>
 				<div id="map" className="map" />
+				{SHOW_DIFFERENT_CALC_VARIANTS &&
+					<div className="map-calc-variants">
+						<select
+							onChange={event => this.onCalcVariantChange(event.target.value)}
+							defaultValue={this.availableCalcVariants[0]}
+						>
+							{this.availableCalcVariants.map((variant, index) => {
+								return (
+									<option value={variant} key={index}>{variant}</option>
+								);
+							})}
+						</select>
+					</div>
+				}
 				{navigationLinks && navigationLinks.variant1 && navigationLinks.variant2 &&
 					<div className="description">
 						<div>
