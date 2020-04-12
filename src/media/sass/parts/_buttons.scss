@@ -1,0 +1,43 @@
+%button-base-colors {
+	background: $c-accent;
+	color: $c-text-invert;
+}
+
+%button-base {
+	@extend %button-base-colors, %centered-flex;
+
+	display: inline-flex;
+	vertical-align: middle;
+	box-sizing: border-box;
+	outline: none;
+	user-select: none;
+	text-align: center;
+	line-height: 1;
+	font-weight: bold;
+	transition: color $default-transition-duration, background-color $default-transition-duration;
+	cursor: pointer;
+	border: 1px solid transparent;
+
+	&:hover {
+		background-color: $c-accent-hover;
+		transition: none;
+	}
+}
+
+.button {
+	@extend %button-base;
+
+	padding: 10px 20px;
+	min-width: 150px;
+	border-radius: $default-border-radius;
+
+	&._outlined {
+		background: none;
+		color: $c-button-oulined;
+		border-color: currentColor;
+
+		&:hover {
+			color: $c-accent;
+		}
+	}
+}
