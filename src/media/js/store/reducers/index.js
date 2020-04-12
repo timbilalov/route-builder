@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux';
-import addresses from './addresses';
+import stages from './stages';
 
 const reducers = combineReducers({
-	addresses,
+	stages,
 });
 
 export default reducers;

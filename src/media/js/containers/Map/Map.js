@@ -3,6 +3,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import Route from './components/Route';
+import { DEFAULT_STAGES } from '../../utils/constants';
+import { getDefaultStagesObject, getStageAddresses } from '../../utils/helpers';
 
 const SHOW_DIFFERENT_CALC_VARIANTS = true;
 
@@ -32,7 +34,9 @@ class Map extends React.Component {
 	};
 
 	static defaultProps = {
-		addresses: [],
+		// addresses: [],
+		// stages: DEFAULT_STAGES,
+		stages: getDefaultStagesObject(),
 	};
 
 	init() {
@@ -59,7 +63,7 @@ class Map extends React.Component {
 		return this.addressesCache.recognized.filter(item => item[key] === value)[0];
 	}
 
-	async geocodeAddresses(addresses = this.props.addresses) {
+	async geocodeAddresses(addresses) {
 		if (addresses.length < 2) {
 			return;
 		}
@@ -323,13 +327,15 @@ class Map extends React.Component {
 	}
 
 	async update(forced = false) {
-		const { addresses } = this.props;
-		if (!forced && JSON.stringify(addresses) === JSON.stringify(this.addressesCache.lastCalculated)) {
+		const { stages } = this.props;
+		const addresses = getStageAddresses(stages);
+
+		if (addresses.length < 2 || (!forced && JSON.stringify(addresses) === JSON.stringify(this.addressesCache.lastCalculated))) {
 			return;
 		}
-		this.addressesCache.lastCalculated = Array.from(addresses);
 
 		this.clearMap();
+		this.addressesCache.lastCalculated = Array.from(addresses);
 
 		const geocoded = await this.geocodeAddresses(addresses);
 		console.log('geocoded', geocoded);
@@ -386,7 +392,7 @@ class Map extends React.Component {
 
 const mapStateToProps = function(state) {
 	return {
-		addresses: state.addresses,
+		stages: state.stages,
 	};
 };
 

@@ -1,17 +1,19 @@
 import React from 'react';
-import FieldBlock from '../components/FieldBlock';
-import store from '../store';
-import { addAddress, editAddress, removeAddress } from '../store/actions';
+import FieldBlock from './components/FieldBlock';
+import store from '../../store';
+import { addAddress, editAddress, removeAddress } from '../../store/actions';
 import { connect } from 'react-redux';
-import VoiceInput from '../components/VoiceInput';
+import VoiceInput from '../../components/VoiceInput';
+import { getDefaultStagesObject, getStageAddresses } from '../../utils/helpers';
 
 class FieldsList extends React.Component {
 	static defaultProps = {
-		addresses: [],
+		stages: getDefaultStagesObject(),
 	};
 
 	onFieldChange(value, index) {
-		const { addresses } = this.props;
+		const { stages } = this.props;
+		const addresses = getStageAddresses(stages);
 		const existingAddress = addresses[index];
 
 		if (existingAddress) {
@@ -26,7 +28,8 @@ class FieldsList extends React.Component {
 	}
 
 	render() {
-		const { addresses } = this.props;
+		const { stages } = this.props;
+		const addresses = getStageAddresses(stages);
 		const fieldsToShow = addresses.slice(0).concat(['']);
 
 		return (
@@ -53,7 +56,7 @@ class FieldsList extends React.Component {
 
 const mapStateToProps = function(state) {
 	return {
-		addresses: state.addresses,
+		stages: state.stages,
 	};
 };
 

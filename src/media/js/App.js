@@ -1,36 +1,26 @@
 import React from 'react';
-import FieldsList from './containers/FieldsList';
+import FieldsList from './containers/FieldsList/FieldsList';
 import Map from './containers/Map/Map';
 import Controls from './containers/Controls';
-import { connect } from 'react-redux';
-import LocalStorage from './components/LocalStorage';
-import { ADDRESSES_STORAGE_KEY } from './utils/constants';
+import GameStages from './containers/GameStages';
 
 class App extends React.Component {
-	static defaultProps = {
-		addresses: [],
-	};
-
-	componentDidUpdate() {
-		const { addresses } = this.props;
-		LocalStorage.setItem(ADDRESSES_STORAGE_KEY, addresses);
-	}
-
 	render() {
 		return (
-			<>
-				<FieldsList />
-				<Controls />
-				<Map />
-			</>
+			<div className="app">
+				<div className="app__section _fields">
+					<div className="container">
+						<GameStages />
+						<FieldsList />
+						<Controls />
+					</div>
+				</div>
+				<div className="app__section _map">
+					<Map />
+				</div>
+			</div>
 		);
 	}
 }
 
-const mapStateToProps = function(state) {
-	return {
-		addresses: state.addresses,
-	};
-};
-
-export default connect(mapStateToProps)(App);
+export default App;

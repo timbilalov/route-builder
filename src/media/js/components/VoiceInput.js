@@ -62,10 +62,6 @@ class VoiceInput extends React.Component {
 
 			this.onResult(this.recognizedString);
 			this.recognizedString = '';
-
-			// this.setState({
-			// 	log: 'recognition.onend',
-			// });
 		};
 
 		recognition.onresult = event => {

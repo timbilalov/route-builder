@@ -1,23 +1,40 @@
 import React from 'react';
-import ClearAddressesControl from '../components/ClearAddressesControl';
 import store from '../store';
-import { clearAddresses } from '../store/actions';
+import { clearAddresses, removeStage } from '../store/actions';
 import { connect } from 'react-redux';
+import { getStageAddresses } from '../utils/helpers';
 
 class Controls extends React.Component {
-	onAddressesClear() {
+	clearAddresses() {
 		store.dispatch(clearAddresses());
 	}
 
+	removeStage() {
+		const { stages } = this.props;
+		store.dispatch(removeStage(stages.currentIndex));
+	}
+
 	render() {
+		const { stages } = this.props;
+		const addresses = getStageAddresses(stages);
+
 		return (
 			<div className="controls">
-				{this.props.addresses.length > 0 ? (
-					<div>
-						<ClearAddressesControl onClick={this.onAddressesClear} />
-					</div>
-				) : (
-					<></>
+				{addresses.length > 0 && (
+					<button
+						onClick={() => this.clearAddresses()}
+						className="button"
+					>
+						Очистить все поля
+					</button>
+				)}
+				{stages.values.length > 1 && (
+					<button
+						onClick={() => this.removeStage()}
+						className="button"
+					>
+						Удалить этап
+					</button>
 				)}
 			</div>
 		);
@@ -26,7 +43,7 @@ class Controls extends React.Component {
 
 const mapStateToProps = function(state) {
 	return {
-		addresses: state.addresses,
+		stages: state.stages,
 	};
 };
 

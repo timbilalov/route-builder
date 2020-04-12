@@ -1,0 +1,10 @@
+.app {
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: space-between;
+	padding: 20px 0;
+
+	&__section {
+		flex: 1 0 0;
+	}
+}
