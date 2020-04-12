@@ -1,5 +1,6 @@
 import React from 'react';
 import Utils from 'utils/Utils';
+import { DEFAULT_INPUT_DEBOUNCE_TIME } from '../../../utils/constants';
 
 class FieldBlock extends React.Component {
 	state = {
@@ -24,7 +25,7 @@ class FieldBlock extends React.Component {
 	componentDidMount() {
 		this.onChangeDebounced = Utils.debounce(value => {
 			this.props.onChange(value);
-		}, 1000);
+		}, DEFAULT_INPUT_DEBOUNCE_TIME);
 	}
 
 	render() {
@@ -41,7 +42,7 @@ class FieldBlock extends React.Component {
 						onChange={event => this.onChange(event.target.value)}
 						value={this.state.value}
 						ref="input"
-						className="field-block__input"
+						className="input field-block__input"
 					/>
 					<button
 						onClick={() => this.props.onRemoveButtonClick(this.refs.input.value)}

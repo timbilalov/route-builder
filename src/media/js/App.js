@@ -3,6 +3,7 @@ import FieldsList from './containers/FieldsList/FieldsList';
 import Map from './containers/Map/Map';
 import Controls from './containers/Controls';
 import GameStages from './containers/GameStages';
+import CitySelection from './containers/CitySelection';
 
 class App extends React.Component {
 	render() {
@@ -10,6 +11,7 @@ class App extends React.Component {
 			<div className="app">
 				<div className="app__section _fields">
 					<div className="container">
+						<CitySelection />
 						<GameStages />
 						<FieldsList />
 						<Controls />

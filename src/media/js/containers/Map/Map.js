@@ -25,6 +25,7 @@ class Map extends React.Component {
 
 	addressesCache = {
 		lastCalculated: [],
+		city: this.props.city,
 		recognized: [],
 	};
 
@@ -34,8 +35,7 @@ class Map extends React.Component {
 	};
 
 	static defaultProps = {
-		// addresses: [],
-		// stages: DEFAULT_STAGES,
+		city: '',
 		stages: getDefaultStagesObject(),
 	};
 
@@ -64,11 +64,9 @@ class Map extends React.Component {
 	}
 
 	async geocodeAddresses(addresses) {
-		if (addresses.length < 2) {
-			return;
-		}
-
 		const promisesArray = [];
+		const { city } = this.props;
+		addresses = addresses.map(address => `${city} ${address}`);
 
 		for (let i = 0; i < addresses.length; i++) {
 			const promise = new Promise(resolve => {
@@ -341,15 +339,30 @@ class Map extends React.Component {
 	}
 
 	async update(forced = false) {
-		const { stages } = this.props;
+		const { stages, city } = this.props;
 		const addresses = getStageAddresses(stages);
+		let shouldReturn = false;
 
-		if (addresses.length < 2 || (!forced && JSON.stringify(addresses) === JSON.stringify(this.addressesCache.lastCalculated))) {
+		if (addresses.length < 2) {
+			shouldReturn = true;
+		} else {
+			if (forced) {
+				shouldReturn = false;
+			} else if (JSON.stringify(addresses) === JSON.stringify(this.addressesCache.lastCalculated)) {
+				if (city === this.addressesCache.city) {
+					shouldReturn = true;
+				}
+			}
+		}
+
+		// TODO: Пока что есть кейсы, когда срабатывает дважды. Проверить.
+		if (shouldReturn) {
 			return;
 		}
 
 		this.clearMap();
 		this.addressesCache.lastCalculated = Array.from(addresses);
+		this.addressesCache.city = city;
 
 		const geocoded = await this.geocodeAddresses(addresses);
 		console.log('geocoded', geocoded); // TEMP
@@ -406,6 +419,7 @@ class Map extends React.Component {
 
 const mapStateToProps = function(state) {
 	return {
+		city: state.city,
 		stages: state.stages,
 	};
 };
