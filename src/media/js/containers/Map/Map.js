@@ -99,12 +99,21 @@ class Map extends React.Component {
 		return Promise.all(promisesArray);
 	}
 
+	factorial(n) {
+		if (n === 1) {
+			return 1;
+		} else {
+			return n * this.factorial(n - 1);
+		}
+	}
+
 	// https://en.wikipedia.org/wiki/Permutation
 	// https://en.wikipedia.org/wiki/Heap%27s_algorithm
 	// https://stackoverflow.com/questions/40598891/heaps-algorithm-walk-through
 	// http://ruslanledesma.com/2016/06/17/why-does-heap-work.html
 	findAllPermutations(length) {
 		const permutations = [];
+		const permutationsRightCount = this.factorial(length);
 
 		function generate(n, array) {
 			array = Array.from(array);
@@ -115,7 +124,7 @@ class Map extends React.Component {
 				for (var i = 0; i < n - 1; i++) {
 					generate(n - 1, array);
 
-					if (n % 2 === 0) {
+					if (n % 2 !== 0) {
 						const one = array[i];
 						const two = array[n - 1];
 
@@ -135,6 +144,11 @@ class Map extends React.Component {
 		}
 
 		generate(length, Array.from(new Array(length)).map((el, index) => index + 1));
+
+		const permutationsUniqueCount = new Set(permutations.map(el => el.toString())).size;
+		if (permutations.length !== permutationsRightCount || permutations.length !== permutationsUniqueCount) {
+			console.warn(`Something wrong with permutations for N=${length}. Counters: total - ${permutations.length}, unique - ${permutationsUniqueCount}, both total and unique must be - ${permutationsRightCount}`)
+		}
 
 		return permutations;
 	}
@@ -338,12 +352,12 @@ class Map extends React.Component {
 		this.addressesCache.lastCalculated = Array.from(addresses);
 
 		const geocoded = await this.geocodeAddresses(addresses);
-		console.log('geocoded', geocoded);
+		console.log('geocoded', geocoded); // TEMP
 		const sorted = await this.sortAddresses(geocoded);
-		console.log('sorted', sorted);
+		console.log('sorted', sorted); // TEMP
 
 		this.buildMultiRoute(sorted);
-		console.log('multiroute builded', sorted);
+		console.log('multiroute builded', sorted); // TEMP
 	}
 
 	componentDidUpdate() {
