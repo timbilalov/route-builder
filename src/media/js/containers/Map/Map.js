@@ -52,6 +52,8 @@ class Map extends React.Component {
 
 			this.update();
 		});
+
+		window.findAllPermutations = (n) => this.findAllPermutations(n); // TEMP
 	}
 
 	componentDidMount() {
@@ -111,44 +113,45 @@ class Map extends React.Component {
 	// https://stackoverflow.com/questions/40598891/heaps-algorithm-walk-through
 	// http://ruslanledesma.com/2016/06/17/why-does-heap-work.html
 	findAllPermutations(length) {
+		const t1 = performance.now();
 		const permutations = [];
 		const permutationsRightCount = this.factorial(length);
 
-		function generate(n, array) {
-			array = Array.from(array);
+		// NOTE: Для правильной работы алгоритма замены должны производиться именно с этим массивом, менять его.
+		const array = Array.from(new Array(length)).map((el, index) => index + 1);
 
+		function generate(n, arr) {
 			if (n === 1) {
-				permutations.push(array);
+				permutations.push(Array.from(arr));
 			} else {
+				generate(n - 1, arr);
+
 				for (var i = 0; i < n - 1; i++) {
-					generate(n - 1, array);
-
-					if (n % 2 !== 0) {
-						const one = array[i];
-						const two = array[n - 1];
-
-						array[i] = two;
-						array[n - 1] = one;
+					if (n % 2 === 0) {
+						const a = arr[i];
+						const b = arr[n - 1];
+						arr[i] = b;
+						arr[n - 1] = a;
 					} else {
-						const first = array[0];
-						const second = array[n - 1];
-
-						array[0] = second;
-						array[n - 1] = first;
+						const a = arr[0];
+						const b = arr[n - 1];
+						arr[0] = b;
+						arr[n - 1] = a;
 					}
-				}
 
-				generate(n - 1, array);
+					generate(n - 1, arr);
+				}
 			}
 		}
 
-		generate(length, Array.from(new Array(length)).map((el, index) => index + 1));
+		generate(length, array);
 
-		// TODO: Сейчас ещё есть кейсы, когда неправильно находит все варианты. Разобраться.
 		const permutationsUniqueCount = new Set(permutations.map(el => el.toString())).size;
 		if (permutations.length !== permutationsRightCount || permutations.length !== permutationsUniqueCount) {
 			console.warn(`Something wrong with permutations for N=${length}. Counters: total - ${permutations.length}, unique - ${permutationsUniqueCount}, both total and unique must be - ${permutationsRightCount}`)
 		}
+		const t2 = performance.now();
+		console.log(`found ${permutations.length} permutations in ${t2 - t1} ms`);
 		return permutations;
 	}
 
@@ -158,6 +161,7 @@ class Map extends React.Component {
 	}
 
 	findMinRouteDistance(availableRouteVariants, coordinates) {
+		const t1 = performance.now();
 		const getDistance = this.getDistanceBetweenCoordinates;
 
 		let minDistance = Infinity;
@@ -192,6 +196,8 @@ class Map extends React.Component {
 			}
 		}
 
+		const t2 = performance.now();
+		console.log(`found min distance for ${availableRouteVariants.length} different route variants in ${t2 - t1} ms`);
 		return minVariant;
 	}
 
