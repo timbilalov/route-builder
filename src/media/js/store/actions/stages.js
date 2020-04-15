@@ -6,6 +6,13 @@ export function setActiveStage(index) {
 	};
 }
 
+export const ADD_NEW_STAGE = 'ADD_NEW_STAGE';
+export function addNewStage() {
+	return {
+		type: ADD_NEW_STAGE,
+	};
+}
+
 export const REMOVE_STAGE = 'REMOVE_STAGE';
 export function removeStage(index) {
 	return {

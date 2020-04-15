@@ -21,6 +21,7 @@ class Map extends React.Component {
 		},
 		routes: [],
 		calcVariant: this.availableCalcVariants[0],
+		isMapClean: true,
 	};
 
 	addressesCache = {
@@ -143,11 +144,11 @@ class Map extends React.Component {
 
 		generate(length, Array.from(new Array(length)).map((el, index) => index + 1));
 
+		// TODO: Сейчас ещё есть кейсы, когда неправильно находит все варианты. Разобраться.
 		const permutationsUniqueCount = new Set(permutations.map(el => el.toString())).size;
 		if (permutations.length !== permutationsRightCount || permutations.length !== permutationsUniqueCount) {
 			console.warn(`Something wrong with permutations for N=${length}. Counters: total - ${permutations.length}, unique - ${permutationsUniqueCount}, both total and unique must be - ${permutationsRightCount}`)
 		}
-
 		return permutations;
 	}
 
@@ -229,16 +230,24 @@ class Map extends React.Component {
 	}
 
 	clearMap() {
+		const { isMapClean } = this.state;
+
+		if (!this.ymap || isMapClean) {
+			return;
+		}
+
 		this.setState({
 			navigationLinks: {
 				variant1: false,
 				variant2: false,
 			},
+			isMapClean: true,
 		});
-		this.ymap && this.ymap.geoObjects.removeAll();
+
+		this.ymap.geoObjects.removeAll();
 	}
 
-	buildMultiRoute(sorted) {
+	async buildMultiRoute(sorted) {
 		const points = sorted.map(item => item.geoObject);
 
 		const multiRoute = new ymaps.multiRouter.MultiRoute(
@@ -292,7 +301,7 @@ class Map extends React.Component {
 			});
 		});
 
-		this.ymap.geoObjects.add(multiRoute);
+		await this.ymap.geoObjects.add(multiRoute);
 	}
 
 	getNavigationLinks(sorted) {
@@ -343,7 +352,9 @@ class Map extends React.Component {
 		const addresses = getStageAddresses(stages);
 		let shouldReturn = false;
 
-		if (addresses.length < 2) {
+		if (!this.ymap) {
+			shouldReturn = true;
+		} else if (addresses.length < 2) {
 			shouldReturn = true;
 		} else {
 			if (forced) {
@@ -355,12 +366,12 @@ class Map extends React.Component {
 			}
 		}
 
-		// TODO: Пока что есть кейсы, когда срабатывает дважды. Проверить.
 		if (shouldReturn) {
 			return;
 		}
 
 		this.clearMap();
+
 		this.addressesCache.lastCalculated = Array.from(addresses);
 		this.addressesCache.city = city;
 
@@ -368,9 +379,12 @@ class Map extends React.Component {
 		console.log('geocoded', geocoded); // TEMP
 		const sorted = await this.sortAddresses(geocoded);
 		console.log('sorted', sorted); // TEMP
-
-		this.buildMultiRoute(sorted);
+		await this.buildMultiRoute(sorted);
 		console.log('multiroute builded', sorted); // TEMP
+
+		this.setState({
+			isMapClean: false,
+		});
 	}
 
 	componentDidUpdate() {

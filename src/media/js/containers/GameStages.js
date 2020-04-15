@@ -1,26 +1,45 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import store from '../store';
-import { setActiveStage } from '../store/actions';
+import { addNewStage, setActiveStage } from '../store/actions';
 
 class GameStages extends React.Component {
 	goToStage(index) {
 		store.dispatch(setActiveStage(index));
 	}
 
+	addNewStage() {
+		store.dispatch(addNewStage());
+	}
+
 	render() {
 		const { stages } = this.props;
 		const { currentIndex, values } = stages;
+		const stagesCount = values.length;
+		const lastStageValue = values[stagesCount - 1];
+		const lastStageAddresses = lastStageValue.addresses;
 
 		return (
 			<div className="stages-nav">
-				<button onClick={() => this.goToStage(currentIndex - 1)}>prev</button>
-				{values.map((value, index) => {
-					return (
-						<button key={index} onClick={() => this.goToStage(index)}>stage {index + 1}</button>
-					);
-				})}
-				<button onClick={() => this.goToStage(currentIndex + 1)}>next</button>
+				<div className="stages-nav__buttons">
+					{values.map((value, index) => {
+						return (
+							<button
+								className={`stages-nav__button ${index === currentIndex ? '_active' : ''}`}
+								key={index}
+								onClick={() => this.goToStage(index)}
+							>
+								Этап {index + 1}
+							</button>
+						);
+					})}
+					<button
+						className={`stages-nav__button ${lastStageAddresses.length < 2 ? '_disabled' : ''}`}
+						onClick={() => this.addNewStage()}
+					>
+						+ следующий этап
+					</button>
+				</div>
 			</div>
 		);
 	}

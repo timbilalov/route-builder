@@ -1,16 +1,20 @@
+%button-reset {
+	outline: none;
+	user-select: none;
+	border: none;
+}
+
 %button-base-colors {
 	background: $c-accent;
 	color: $c-text-invert;
 }
 
 %button-base {
-	@extend %button-base-colors, %centered-flex;
+	@extend %button-reset, %button-base-colors, %centered-flex;
 
 	display: inline-flex;
 	vertical-align: middle;
 	box-sizing: border-box;
-	outline: none;
-	user-select: none;
 	text-align: center;
 	line-height: 1;
 	font-weight: bold;

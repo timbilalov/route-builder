@@ -1,5 +1,5 @@
 import {
-	ADD_ADDRESS,
+	ADD_ADDRESS, ADD_NEW_STAGE,
 	CLEAR_ADDRESSES,
 	EDIT_ADDRESS,
 	REMOVE_ADDRESS, REMOVE_STAGE,
@@ -23,21 +23,22 @@ export default function stages(state = savedStages || getDefaultStagesObject(), 
 	switch (type) {
 		case SET_ACTIVE_STAGE: {
 			let { index } = action;
-
-			index = Math.max(0, Math.min(stagesCount, index));
-			const isNext = index === stagesCount;
-
-			if (isNext) {
-				if (values[stagesCount - 1] && values[stagesCount - 1].addresses.length) {
-					const defaultStageValue = getDefaultStageValue();
-					defaultStageValue.addresses.push(currentValue.addresses[currentValue.addresses.length - 1]);
-					values.push(defaultStageValue);
-				} else {
-					index = stagesCount - 1;
-				}
-			}
-
+			index = Math.max(0, Math.min(stagesCount - 1, index));
 			newState.currentIndex = index;
+			break;
+		}
+
+		case ADD_NEW_STAGE: {
+			const index = stagesCount;
+			const lastStageValue = values[stagesCount - 1];
+			const lastStageAddresses = lastStageValue.addresses;
+
+			if (lastStageValue && lastStageAddresses.length > 1) {
+				const defaultStageValue = getDefaultStageValue();
+				defaultStageValue.addresses.push(lastStageAddresses[lastStageAddresses.length - 1]);
+				values.push(defaultStageValue);
+				newState.currentIndex = index;
+			}
 			break;
 		}
 
