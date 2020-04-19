@@ -26,6 +26,7 @@ class Map extends React.Component {
 		routes: [],
 		calcVariant: this.availableCalcVariants[0],
 		isMapClean: true,
+		isCalculating: false,
 	};
 
 	addressesCache = {
@@ -130,6 +131,15 @@ class Map extends React.Component {
 			if (calcFromStorage) {
 				routeByMinDistance = calcFromStorage.routeByMinDistance;
 			} else {
+				if (this._calcTimeout) {
+					clearTimeout(this._calcTimeout);
+				}
+				this._calcTimeout = setTimeout(() => {
+					this.setState({
+						isCalculating: true,
+					});
+				}, 200);
+
 				if (USE_WEBWORKER && USE_COMBINED_CALC) {
 					const workerCalcOptions = {
 						type: 'combinedRouteCalc',
@@ -183,6 +193,13 @@ class Map extends React.Component {
 				};
 				storageValue.push(newStorageObject);
 				LocalStorage.setItem(storageKey, storageValue);
+
+				if (this._calcTimeout) {
+					clearTimeout(this._calcTimeout);
+				}
+				this.setState({
+					isCalculating: false,
+				});
 			}
 
 			const sorted = routeByMinDistance.map(index => geocoded[index]);
@@ -366,11 +383,16 @@ class Map extends React.Component {
 	}
 
 	render() {
-		const { routes, navigationLinks } = this.state;
+		const { routes, navigationLinks, isCalculating } = this.state;
 
 		return (
 			<div>
-				<div id="map" className="map" />
+				<div id="map" className={`map ${isCalculating ? '_calculating' : ''}`}>
+					<div className="map__spinner-wrapper">
+						<div className="map__spinner" />
+					</div>
+				</div>
+
 				{SHOW_DIFFERENT_CALC_VARIANTS &&
 					<div className="map-calc-variants">
 						<select
@@ -385,6 +407,7 @@ class Map extends React.Component {
 						</select>
 					</div>
 				}
+
 				{navigationLinks && navigationLinks.variant1 && navigationLinks.variant2 &&
 					<div className="description">
 						<div>
@@ -395,6 +418,7 @@ class Map extends React.Component {
 						</div>
 					</div>
 				}
+
 				{routes.map((routeData, index) => {
 					return (
 						<Route key={index} data={routeData} map={this.ymap} />

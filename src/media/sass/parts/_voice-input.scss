@@ -1,14 +1,8 @@
-@keyframes rotation {
-	to {
-		transform: rotate(360deg);
-	}
-}
-
 .voice-input {
 	margin: 20px 0;
 
 	&__record-icon {
-		@extend %button-base;
+		@extend %button-base, %spinner-default;
 
 		position: relative;
 		width: 30px;
@@ -18,41 +12,7 @@
 
 		&:before,
 		&:after {
-			@extend %full-sized;
-
-			content: "";
-			border-radius: 100%;
-			box-sizing: content-box;
-			will-change: transform, opacity;
 			opacity: 0;
-			pointer-events: none;
-			transition: opacity $default-transition-duration;
-		}
-
-		&:before {
-			$padding: 3px;
-			$border-size: 2px;
-			$offset: -($padding + $border-size);
-
-			margin-left: $offset;
-			margin-top: $offset;
-			border: $border-size solid transparent;
-			border-top-color: $c-accent-2;
-			padding: $padding;
-			animation: rotation 0.5s infinite linear;
-		}
-
-		&:after {
-			$padding: 12px;
-			$border-size: 4px;
-			$offset: -($padding + $border-size);
-
-			margin-left: $offset;
-			margin-top: $offset;
-			border: $border-size solid transparent;
-			border-left-color: $c-accent-3;
-			padding: $padding;
-			animation: rotation 1.2s infinite linear;
 		}
 
 		&._animating {
