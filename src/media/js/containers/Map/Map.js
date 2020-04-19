@@ -3,8 +3,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import Route from './components/Route';
-import { DEFAULT_STAGES } from '../../utils/constants';
 import { getDefaultStagesObject, getStageAddresses } from '../../utils/helpers';
+import WebWorker from '../../components/WebWorker';
+import { findAllPermutations, findMinRouteDistance } from '../../utils/helpers';
+import { USE_COMBINED_CALC, USE_WEBWORKER } from '../../utils/constants';
 
 const SHOW_DIFFERENT_CALC_VARIANTS = true;
 
@@ -52,8 +54,6 @@ class Map extends React.Component {
 
 			this.update();
 		});
-
-		window.findAllPermutations = (n) => this.findAllPermutations(n); // TEMP
 	}
 
 	componentDidMount() {
@@ -100,107 +100,6 @@ class Map extends React.Component {
 		return Promise.all(promisesArray);
 	}
 
-	factorial(n) {
-		if (n === 1) {
-			return 1;
-		} else {
-			return n * this.factorial(n - 1);
-		}
-	}
-
-	// https://en.wikipedia.org/wiki/Permutation
-	// https://en.wikipedia.org/wiki/Heap%27s_algorithm
-	// https://stackoverflow.com/questions/40598891/heaps-algorithm-walk-through
-	// http://ruslanledesma.com/2016/06/17/why-does-heap-work.html
-	findAllPermutations(length) {
-		const t1 = performance.now();
-		const permutations = [];
-		const permutationsRightCount = this.factorial(length);
-
-		// NOTE: Для правильной работы алгоритма замены должны производиться именно с этим массивом, менять его.
-		const array = Array.from(new Array(length)).map((el, index) => index + 1);
-
-		function generate(n, arr) {
-			if (n === 1) {
-				permutations.push(Array.from(arr));
-			} else {
-				generate(n - 1, arr);
-
-				for (var i = 0; i < n - 1; i++) {
-					if (n % 2 === 0) {
-						const a = arr[i];
-						const b = arr[n - 1];
-						arr[i] = b;
-						arr[n - 1] = a;
-					} else {
-						const a = arr[0];
-						const b = arr[n - 1];
-						arr[0] = b;
-						arr[n - 1] = a;
-					}
-
-					generate(n - 1, arr);
-				}
-			}
-		}
-
-		generate(length, array);
-
-		const permutationsUniqueCount = new Set(permutations.map(el => el.toString())).size;
-		if (permutations.length !== permutationsRightCount || permutations.length !== permutationsUniqueCount) {
-			console.warn(`Something wrong with permutations for N=${length}. Counters: total - ${permutations.length}, unique - ${permutationsUniqueCount}, both total and unique must be - ${permutationsRightCount}`)
-		}
-		const t2 = performance.now();
-		console.log(`found ${permutations.length} permutations in ${t2 - t1} ms`);
-		return permutations;
-	}
-
-	getDistanceBetweenCoordinates(c1, c2) {
-		const mult = 1000;
-		return Math.sqrt(Math.pow(Math.abs(c1[0] * mult - c2[0] * mult), 2) + Math.pow(Math.abs(c1[1] * mult - c2[1] * mult), 2));
-	}
-
-	findMinRouteDistance(availableRouteVariants, coordinates) {
-		const t1 = performance.now();
-		const getDistance = this.getDistanceBetweenCoordinates;
-
-		let minDistance = Infinity;
-		let minVariant;
-
-		for (let i = 0; i < availableRouteVariants.length; i++) {
-			const variant = availableRouteVariants[i];
-			const variantDistance = variant
-				.map(index => coordinates[index]).reduce((prev, current, i) => {
-					const nextPrev = current;
-					let distance;
-
-					if (i === 1) {
-						distance = getDistance(prev, current);
-					} else {
-						distance = prev.distance + getDistance(prev.prev, current);
-					}
-
-					if (i < variant.length - 1) {
-						return {
-							distance: distance,
-							prev: nextPrev,
-						};
-					} else {
-						return distance;
-					}
-				});
-
-			if (variantDistance < minDistance) {
-				minDistance = variantDistance;
-				minVariant = variant;
-			}
-		}
-
-		const t2 = performance.now();
-		console.log(`found min distance for ${availableRouteVariants.length} different route variants in ${t2 - t1} ms`);
-		return minVariant;
-	}
-
 	onCalcVariantChange(variant) {
 		this.setState({
 			calcVariant: variant,
@@ -212,27 +111,79 @@ class Map extends React.Component {
 		const geoObjects = geocoded.map(item => item.geoObject);
 		const { calcVariant } = this.state;
 		const { availableCalcVariants } = this;
+		const permutationsArrayLength = geocoded.length - 1;
+		const coordinates = geocoded.map(item => item.coordinates);
+		let result;
 
-		return new Promise(resolve => {
-			if (calcVariant === availableCalcVariants[0]) {
-				const coordinates = geocoded.map(item => item.coordinates);
-				const availableRouteVariants = this.findAllPermutations(geocoded.length - 1).map(el => [0].concat(el));
-				const routeByMinDistance = this.findMinRouteDistance(availableRouteVariants, coordinates);
+		console.time('sortAddresses'); // TEMP
 
-				const sorted = routeByMinDistance.map(index => geocoded[index]);
-				resolve(sorted);
+		if (calcVariant === availableCalcVariants[0]) {
+			let permutations;
+			let routeByMinDistance;
+
+			if (USE_WEBWORKER && USE_COMBINED_CALC) {
+				const workerCalcOptions = {
+					type: 'combinedRouteCalc',
+					value: {
+						coordinates,
+					},
+				};
+
+				const minRouteDistanceFromWorker = await WebWorker.calculate(workerCalcOptions);
+				if (minRouteDistanceFromWorker) {
+					routeByMinDistance = minRouteDistanceFromWorker;
+				} else {
+					permutations = findAllPermutations(permutationsArrayLength);
+					const availableRouteVariants = permutations.map(el => [0].concat(el));
+					routeByMinDistance = findMinRouteDistance(availableRouteVariants, coordinates);
+				}
 			} else {
-				const query	= ymaps.geoQuery(geoObjects.slice(1)).sortByDistance(geoObjects[0]);
-				query.then(() => {
-					const firstAddressObject = this.getRecognizedAddress('geoObject', geoObjects[0]);
-					const otherAddressObjects = [];
-					query.each(r => otherAddressObjects.push(this.getRecognizedAddress('geoObject', r)));
+				const workerCalcOptionsPermutations = {
+					type: 'permutations',
+					value: permutationsArrayLength,
+				};
 
-					const sorted = [firstAddressObject].concat(otherAddressObjects);
-					resolve(sorted);
-				});
+				if (USE_WEBWORKER) {
+					const permutationsFromWorker = await WebWorker.calculate(workerCalcOptionsPermutations);
+					permutations = permutationsFromWorker && permutationsFromWorker.length ? permutationsFromWorker : findAllPermutations(permutationsArrayLength);
+				} else {
+					permutations = findAllPermutations(permutationsArrayLength);
+				}
+
+				const availableRouteVariants = permutations.map(el => [0].concat(el));
+
+				if (USE_WEBWORKER) {
+					const workerCalcOptionsDistance = {
+						type: 'minRouteDistance',
+						value: {
+							routeVariants: availableRouteVariants,
+							coordinates,
+						},
+					};
+
+					const minRouteDistanceFromWorker = await WebWorker.calculate(workerCalcOptionsDistance);
+					routeByMinDistance = minRouteDistanceFromWorker ? minRouteDistanceFromWorker : findMinRouteDistance(availableRouteVariants, coordinates);
+				} else {
+					routeByMinDistance = findMinRouteDistance(availableRouteVariants, coordinates);
+				}
 			}
-		});
+
+			const sorted = routeByMinDistance.map(index => geocoded[index]);
+			result = sorted;
+		} else {
+			const query	= ymaps.geoQuery(geoObjects.slice(1)).sortByDistance(geoObjects[0]);
+			await query.then(() => {
+				const firstAddressObject = this.getRecognizedAddress('geoObject', geoObjects[0]);
+				const otherAddressObjects = [];
+				query.each(r => otherAddressObjects.push(this.getRecognizedAddress('geoObject', r)));
+
+				const sorted = [firstAddressObject].concat(otherAddressObjects);
+				result = sorted;
+			});
+		}
+
+		console.timeEnd('sortAddresses');
+		return result;
 	}
 
 	clearMap() {

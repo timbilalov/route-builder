@@ -9,3 +9,6 @@ export const DEFAULT_STAGES = {
 	currentIndex: 0,
 };
 export const DEFAULT_INPUT_DEBOUNCE_TIME = 1000;
+export const USE_WEBWORKER = true;
+export const USE_COMBINED_CALC = true;
+export const USE_JSON_FOR_WEBWORKER_DATA = true;
