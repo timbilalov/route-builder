@@ -6,7 +6,7 @@ import Route from './components/Route';
 import { getDefaultStagesObject, getStageAddresses } from '../../utils/helpers';
 import WebWorker from '../../components/WebWorker';
 import { findAllPermutations, findMinRouteDistance } from '../../utils/helpers';
-import { USE_COMBINED_CALC, USE_WEBWORKER } from '../../utils/constants';
+import { MAX_CALC_MIN_DISTANCE_POINTS, USE_COMBINED_CALC, USE_WEBWORKER } from '../../utils/constants';
 import LocalStorage from '../../components/LocalStorage';
 
 const STORAGE_KEY_PREFIX = 'map-';
@@ -120,7 +120,12 @@ class Map extends React.Component {
 
 		console.time('sortAddresses'); // TEMP
 
-		if (calcVariant === availableCalcVariants[0]) {
+		const shouldCalcByMinDistance = permutationsArrayLength < MAX_CALC_MIN_DISTANCE_POINTS; // TODO: Подумать, можно ли увеличить это кол-во (за счёт кеширования, мемоизации или ещё чего-нибудь.
+		if (calcVariant === availableCalcVariants[0] && !shouldCalcByMinDistance) {
+			console.warn(`Current version doesn't support calc by min route distance for more than ${MAX_CALC_MIN_DISTANCE_POINTS} points.`);
+		}
+
+		if (calcVariant === availableCalcVariants[0] && shouldCalcByMinDistance) {
 			let permutations;
 			let routeByMinDistance;
 
