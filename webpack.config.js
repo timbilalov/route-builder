@@ -30,6 +30,7 @@ export const config = {
 					loader: 'worker-loader',
 					options: {
 						name: '[name].js',
+						publicPath: 'media/js/',
 					},
 				},
 			},
