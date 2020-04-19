@@ -18,7 +18,9 @@ class App extends React.Component {
 					</div>
 				</div>
 				<div className="app__section _map">
-					<Map />
+					<div className="container">
+						<Map />
+					</div>
 				</div>
 			</div>
 		);
