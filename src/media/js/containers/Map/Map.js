@@ -7,7 +7,9 @@ import { getDefaultStagesObject, getStageAddresses } from '../../utils/helpers';
 import WebWorker from '../../components/WebWorker';
 import { findAllPermutations, findMinRouteDistance } from '../../utils/helpers';
 import { USE_COMBINED_CALC, USE_WEBWORKER } from '../../utils/constants';
+import LocalStorage from '../../components/LocalStorage';
 
+const STORAGE_KEY_PREFIX = 'map-';
 const SHOW_DIFFERENT_CALC_VARIANTS = true;
 
 class Map extends React.Component {
@@ -121,51 +123,66 @@ class Map extends React.Component {
 			let permutations;
 			let routeByMinDistance;
 
-			if (USE_WEBWORKER && USE_COMBINED_CALC) {
-				const workerCalcOptions = {
-					type: 'combinedRouteCalc',
-					value: {
-						coordinates,
-					},
-				};
-
-				const minRouteDistanceFromWorker = await WebWorker.calculate(workerCalcOptions);
-				if (minRouteDistanceFromWorker) {
-					routeByMinDistance = minRouteDistanceFromWorker;
-				} else {
-					permutations = findAllPermutations(permutationsArrayLength);
-					const availableRouteVariants = permutations.map(el => [0].concat(el));
-					routeByMinDistance = findMinRouteDistance(availableRouteVariants, coordinates);
-				}
+			const storageKey = STORAGE_KEY_PREFIX + 'sort';
+			const storageValue = LocalStorage.getItem(storageKey) || [];
+			const coordinatesKey = JSON.stringify(coordinates);
+			const calcFromStorage = storageValue.filter(item => item.coordinates === coordinatesKey)[0];
+			if (calcFromStorage) {
+				routeByMinDistance = calcFromStorage.routeByMinDistance;
 			} else {
-				const workerCalcOptionsPermutations = {
-					type: 'permutations',
-					value: permutationsArrayLength,
-				};
-
-				if (USE_WEBWORKER) {
-					const permutationsFromWorker = await WebWorker.calculate(workerCalcOptionsPermutations);
-					permutations = permutationsFromWorker && permutationsFromWorker.length ? permutationsFromWorker : findAllPermutations(permutationsArrayLength);
-				} else {
-					permutations = findAllPermutations(permutationsArrayLength);
-				}
-
-				const availableRouteVariants = permutations.map(el => [0].concat(el));
-
-				if (USE_WEBWORKER) {
-					const workerCalcOptionsDistance = {
-						type: 'minRouteDistance',
+				if (USE_WEBWORKER && USE_COMBINED_CALC) {
+					const workerCalcOptions = {
+						type: 'combinedRouteCalc',
 						value: {
-							routeVariants: availableRouteVariants,
 							coordinates,
 						},
 					};
 
-					const minRouteDistanceFromWorker = await WebWorker.calculate(workerCalcOptionsDistance);
-					routeByMinDistance = minRouteDistanceFromWorker ? minRouteDistanceFromWorker : findMinRouteDistance(availableRouteVariants, coordinates);
+					const minRouteDistanceFromWorker = await WebWorker.calculate(workerCalcOptions);
+					if (minRouteDistanceFromWorker) {
+						routeByMinDistance = minRouteDistanceFromWorker;
+					} else {
+						permutations = findAllPermutations(permutationsArrayLength);
+						const availableRouteVariants = permutations.map(el => [0].concat(el));
+						routeByMinDistance = findMinRouteDistance(availableRouteVariants, coordinates);
+					}
 				} else {
-					routeByMinDistance = findMinRouteDistance(availableRouteVariants, coordinates);
+					const workerCalcOptionsPermutations = {
+						type: 'permutations',
+						value: permutationsArrayLength,
+					};
+
+					if (USE_WEBWORKER) {
+						const permutationsFromWorker = await WebWorker.calculate(workerCalcOptionsPermutations);
+						permutations = permutationsFromWorker && permutationsFromWorker.length ? permutationsFromWorker : findAllPermutations(permutationsArrayLength);
+					} else {
+						permutations = findAllPermutations(permutationsArrayLength);
+					}
+
+					const availableRouteVariants = permutations.map(el => [0].concat(el));
+
+					if (USE_WEBWORKER) {
+						const workerCalcOptionsDistance = {
+							type: 'minRouteDistance',
+							value: {
+								routeVariants: availableRouteVariants,
+								coordinates,
+							},
+						};
+
+						const minRouteDistanceFromWorker = await WebWorker.calculate(workerCalcOptionsDistance);
+						routeByMinDistance = minRouteDistanceFromWorker ? minRouteDistanceFromWorker : findMinRouteDistance(availableRouteVariants, coordinates);
+					} else {
+						routeByMinDistance = findMinRouteDistance(availableRouteVariants, coordinates);
+					}
 				}
+
+				const newStorageObject = {
+					coordinates: coordinatesKey,
+					routeByMinDistance,
+				};
+				storageValue.push(newStorageObject);
+				LocalStorage.setItem(storageKey, storageValue);
 			}
 
 			const sorted = routeByMinDistance.map(index => geocoded[index]);
