@@ -1,0 +1,30 @@
+.app {
+	display: block;
+	padding: 20px 0;
+
+	&__section {
+		flex: 1 0 0;
+		margin-bottom: 20px;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	@media screen and (min-width: 800px) {
+		display: flex;
+		flex-direction: row-reverse;
+		justify-content: space-between;
+
+		&__section {
+			margin: 0;
+
+			&._map {
+				.container {
+					max-width: none;
+					padding: 0;
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,34 @@
+.voice-input {
+	margin: 20px 0;
+
+	&__record-icon {
+		@extend %button-base, %spinner-default;
+
+		position: relative;
+		width: 30px;
+		height: 30px;
+		padding: 7px;
+		border-radius: 100%;
+
+		&:before,
+		&:after {
+			opacity: 0;
+		}
+
+		&._animating {
+			&:before,
+			&:after {
+				opacity: 1;
+				pointer-events: auto;
+				transition: none;
+			}
+		}
+	}
+
+	&__error {
+		display: inline-block;
+		vertical-align: middle;
+		margin-left: 10px;
+		color: $c-error;
+	}
+}

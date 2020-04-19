@@ -3,18 +3,35 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import Route from './components/Route';
+import { getDefaultStagesObject, getStageAddresses } from '../../utils/helpers';
+import WebWorker from '../../components/WebWorker';
+import { findAllPermutations, findMinRouteDistance } from '../../utils/helpers';
+import { MAX_CALC_MIN_DISTANCE_POINTS, USE_COMBINED_CALC, USE_WEBWORKER } from '../../utils/constants';
+import LocalStorage from '../../components/LocalStorage';
+
+const STORAGE_KEY_PREFIX = 'map-';
+const SHOW_DIFFERENT_CALC_VARIANTS = true;
 
 class Map extends React.Component {
+	availableCalcVariants = [
+		'minRouteDistance',
+		'nearestPoint',
+	];
+
 	state = {
 		navigationLinks: {
 			variant1: false,
 			variant2: false,
 		},
 		routes: [],
+		calcVariant: this.availableCalcVariants[0],
+		isMapClean: true,
+		isCalculating: false,
 	};
 
 	addressesCache = {
 		lastCalculated: [],
+		city: this.props.city,
 		recognized: [],
 	};
 
@@ -24,7 +41,8 @@ class Map extends React.Component {
 	};
 
 	static defaultProps = {
-		addresses: [],
+		city: '',
+		stages: getDefaultStagesObject(),
 	};
 
 	init() {
@@ -51,14 +69,10 @@ class Map extends React.Component {
 		return this.addressesCache.recognized.filter(item => item[key] === value)[0];
 	}
 
-	async geocodeAddresses(addresses = this.props.addresses) {
-		this.clearMap();
-
-		if (addresses.length < 2) {
-			return;
-		}
-
+	async geocodeAddresses(addresses) {
 		const promisesArray = [];
+		const { city } = this.props;
+		addresses = addresses.map(address => `${city} ${address}`);
 
 		for (let i = 0; i < addresses.length; i++) {
 			const promise = new Promise(resolve => {
@@ -74,7 +88,7 @@ class Map extends React.Component {
 						const recognized = {
 							name: addressEntered,
 							orderEntered: i + 1,
-							coords: geoObject.geometry.getCoordinates(),
+							coordinates: geoObject.geometry.getCoordinates(),
 							geoObject,
 						};
 
@@ -89,34 +103,147 @@ class Map extends React.Component {
 		return Promise.all(promisesArray);
 	}
 
+	onCalcVariantChange(variant) {
+		this.setState({
+			calcVariant: variant,
+		});
+		this.update(true);
+	}
+
 	async sortAddresses(geocoded) {
 		const geoObjects = geocoded.map(item => item.geoObject);
+		const { calcVariant } = this.state;
+		const { availableCalcVariants } = this;
+		const permutationsArrayLength = geocoded.length - 1;
+		const coordinates = geocoded.map(item => item.coordinates);
+		let result;
 
-		return new Promise(resolve => {
+		console.time('sortAddresses'); // TEMP
+
+		const shouldCalcByMinDistance = permutationsArrayLength < MAX_CALC_MIN_DISTANCE_POINTS; // TODO: Подумать, можно ли увеличить это кол-во (за счёт кеширования, мемоизации или ещё чего-нибудь.
+		if (calcVariant === availableCalcVariants[0] && !shouldCalcByMinDistance) {
+			console.warn(`Current version doesn't support calc by min route distance for more than ${MAX_CALC_MIN_DISTANCE_POINTS} points.`);
+		}
+
+		if (calcVariant === availableCalcVariants[0] && shouldCalcByMinDistance) {
+			let permutations;
+			let routeByMinDistance;
+
+			const storageKey = STORAGE_KEY_PREFIX + 'sort';
+			const storageValue = LocalStorage.getItem(storageKey) || [];
+			const coordinatesKey = JSON.stringify(coordinates);
+			const calcFromStorage = storageValue.filter(item => item.coordinates === coordinatesKey)[0];
+			if (calcFromStorage) {
+				routeByMinDistance = calcFromStorage.routeByMinDistance;
+			} else {
+				if (this._calcTimeout) {
+					clearTimeout(this._calcTimeout);
+				}
+				this._calcTimeout = setTimeout(() => {
+					this.setState({
+						isCalculating: true,
+					});
+				}, 200);
+
+				if (USE_WEBWORKER && USE_COMBINED_CALC) {
+					const workerCalcOptions = {
+						type: 'combinedRouteCalc',
+						value: {
+							coordinates,
+						},
+					};
+
+					const minRouteDistanceFromWorker = await WebWorker.calculate(workerCalcOptions);
+					if (minRouteDistanceFromWorker) {
+						routeByMinDistance = minRouteDistanceFromWorker;
+					} else {
+						permutations = findAllPermutations(permutationsArrayLength);
+						const availableRouteVariants = permutations.map(el => [0].concat(el));
+						routeByMinDistance = findMinRouteDistance(availableRouteVariants, coordinates);
+					}
+				} else {
+					const workerCalcOptionsPermutations = {
+						type: 'permutations',
+						value: permutationsArrayLength,
+					};
+
+					if (USE_WEBWORKER) {
+						const permutationsFromWorker = await WebWorker.calculate(workerCalcOptionsPermutations);
+						permutations = permutationsFromWorker && permutationsFromWorker.length ? permutationsFromWorker : findAllPermutations(permutationsArrayLength);
+					} else {
+						permutations = findAllPermutations(permutationsArrayLength);
+					}
+
+					const availableRouteVariants = permutations.map(el => [0].concat(el));
+
+					if (USE_WEBWORKER) {
+						const workerCalcOptionsDistance = {
+							type: 'minRouteDistance',
+							value: {
+								routeVariants: availableRouteVariants,
+								coordinates,
+							},
+						};
+
+						const minRouteDistanceFromWorker = await WebWorker.calculate(workerCalcOptionsDistance);
+						routeByMinDistance = minRouteDistanceFromWorker ? minRouteDistanceFromWorker : findMinRouteDistance(availableRouteVariants, coordinates);
+					} else {
+						routeByMinDistance = findMinRouteDistance(availableRouteVariants, coordinates);
+					}
+				}
+
+				const newStorageObject = {
+					coordinates: coordinatesKey,
+					routeByMinDistance,
+				};
+				storageValue.push(newStorageObject);
+				LocalStorage.setItem(storageKey, storageValue);
+
+				if (this._calcTimeout) {
+					clearTimeout(this._calcTimeout);
+				}
+				this.setState({
+					isCalculating: false,
+				});
+			}
+
+			const sorted = routeByMinDistance.map(index => geocoded[index]);
+			result = sorted;
+		} else {
 			const query	= ymaps.geoQuery(geoObjects.slice(1)).sortByDistance(geoObjects[0]);
-
-			query.then(() => {
+			await query.then(() => {
 				const firstAddressObject = this.getRecognizedAddress('geoObject', geoObjects[0]);
 				const otherAddressObjects = [];
 				query.each(r => otherAddressObjects.push(this.getRecognizedAddress('geoObject', r)));
-				const sorted = [firstAddressObject].concat(otherAddressObjects);
 
-				resolve(sorted);
+				const sorted = [firstAddressObject].concat(otherAddressObjects);
+				result = sorted;
 			});
-		});
+		}
+
+		console.timeEnd('sortAddresses');
+		return result;
 	}
 
 	clearMap() {
+		const { isMapClean } = this.state;
+
+		if (!this.ymap || isMapClean) {
+			return;
+		}
+
 		this.setState({
 			navigationLinks: {
 				variant1: false,
 				variant2: false,
 			},
+			isMapClean: true,
 		});
-		this.ymap && this.ymap.geoObjects.removeAll();
+
+		this.ymap.geoObjects.removeAll();
 	}
 
-	buildMultiRoute(sorted) {
+	async buildMultiRoute(sorted) {
 		const points = sorted.map(item => item.geoObject);
 
 		const multiRoute = new ymaps.multiRouter.MultiRoute(
@@ -170,11 +297,11 @@ class Map extends React.Component {
 			});
 		});
 
-		this.ymap.geoObjects.add(multiRoute);
+		await this.ymap.geoObjects.add(multiRoute);
 	}
 
 	getNavigationLinks(sorted) {
-		const coordinates = Array.from(sorted).map(item => item.coords);
+		const coordinates = Array.from(sorted).map(item => item.coordinates);
 
 		const hrefParts = [];
 		hrefParts.push(`z=${this.mapInitialOptions.zoom}`);
@@ -216,20 +343,44 @@ class Map extends React.Component {
 		};
 	}
 
-	async update() {
-		const { addresses } = this.props;
-		if (JSON.stringify(addresses) === JSON.stringify(this.addressesCache.lastCalculated)) {
+	async update(forced = false) {
+		const { stages, city } = this.props;
+		const addresses = getStageAddresses(stages);
+		let shouldReturn = false;
+
+		if (!this.ymap) {
+			shouldReturn = true;
+		} else if (addresses.length < 2) {
+			shouldReturn = true;
+		} else {
+			if (forced) {
+				shouldReturn = false;
+			} else if (JSON.stringify(addresses) === JSON.stringify(this.addressesCache.lastCalculated)) {
+				if (city === this.addressesCache.city) {
+					shouldReturn = true;
+				}
+			}
+		}
+
+		if (shouldReturn) {
 			return;
 		}
+
+		this.clearMap();
+
 		this.addressesCache.lastCalculated = Array.from(addresses);
+		this.addressesCache.city = city;
 
 		const geocoded = await this.geocodeAddresses(addresses);
-		console.log('geocoded', geocoded);
+		console.log('geocoded', geocoded); // TEMP
 		const sorted = await this.sortAddresses(geocoded);
-		console.log('sorted', sorted);
+		console.log('sorted', sorted); // TEMP
+		await this.buildMultiRoute(sorted);
+		console.log('multiroute builded', sorted); // TEMP
 
-		this.buildMultiRoute(sorted);
-		console.log('multiroute builded', sorted);
+		this.setState({
+			isMapClean: false,
+		});
 	}
 
 	componentDidUpdate() {
@@ -237,11 +388,31 @@ class Map extends React.Component {
 	}
 
 	render() {
-		const { routes, navigationLinks } = this.state;
+		const { routes, navigationLinks, isCalculating } = this.state;
 
 		return (
 			<div>
-				<div id="map" className="map" />
+				<div id="map" className={`map ${isCalculating ? '_calculating' : ''}`}>
+					<div className="map__spinner-wrapper">
+						<div className="map__spinner" />
+					</div>
+				</div>
+
+				{SHOW_DIFFERENT_CALC_VARIANTS &&
+					<div className="map-calc-variants">
+						<select
+							onChange={event => this.onCalcVariantChange(event.target.value)}
+							defaultValue={this.availableCalcVariants[0]}
+						>
+							{this.availableCalcVariants.map((variant, index) => {
+								return (
+									<option value={variant} key={index}>{variant}</option>
+								);
+							})}
+						</select>
+					</div>
+				}
+
 				{navigationLinks && navigationLinks.variant1 && navigationLinks.variant2 &&
 					<div className="description">
 						<div>
@@ -252,6 +423,7 @@ class Map extends React.Component {
 						</div>
 					</div>
 				}
+
 				{routes.map((routeData, index) => {
 					return (
 						<Route key={index} data={routeData} map={this.ymap} />
@@ -264,7 +436,8 @@ class Map extends React.Component {
 
 const mapStateToProps = function(state) {
 	return {
-		addresses: state.addresses,
+		city: state.city,
+		stages: state.stages,
 	};
 };
 

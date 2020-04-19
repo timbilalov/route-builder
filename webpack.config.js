@@ -25,6 +25,15 @@ export const config = {
 	module: {
 		rules: [
 			{
+				test: /worker\.js$/,
+				use: {
+					loader: 'worker-loader',
+					options: {
+						name: '[name].js',
+					},
+				},
+			},
+			{
 				test: /\.js$/,
 				enforce: 'pre',
 				include: [path.resolve(__dirname, 'src/media/js'), path.resolve(__dirname, 'node_modules/gsap')],

@@ -1,6 +1,7 @@
 import React from 'react';
 import store from '../store';
 import { addAddress } from '../store/actions';
+import SvgIcon from './SvgIcon';
 
 const REPEAT_LISTENING_DELAY = 500;
 
@@ -10,7 +11,7 @@ const REPEAT_LISTENING_DELAY = 500;
 
 class VoiceInput extends React.Component {
 	state = {
-		isRecognizing: false,
+		isRecording: false,
 		isError: false,
 	};
 
@@ -24,7 +25,6 @@ class VoiceInput extends React.Component {
 
 		if (!SpeechRecognition) {
 			console.warn(`Speech recognition isn't supported in your browser`);
-			// env.isMobile && alert(`Speech recognition isn't supported in your browser`);
 			return;
 		}
 
@@ -35,20 +35,29 @@ class VoiceInput extends React.Component {
 
 		recognition.onstart = () => {
 			this.setState({
-				isRecognizing: true,
+				isRecording: true,
+			});
+
+			this.setState({
+				log: 'recognition.onstart',
 			});
 		};
 
 		recognition.onerror = event => {
 			this.setState({
-				isError: true,
+				errorMessage: `Recognition error: ${JSON.stringify(event.error)}`,
 			});
-			console.warn('recognition onerror: ' + event.error);
+
+			setTimeout(() => {
+				this.setState({
+					errorMessage: '',
+				});
+			}, 2000);
 		};
 
 		recognition.onend = () => {
 			this.setState({
-				isRecognizing: false,
+				isRecording: false,
 			});
 
 			this.onResult(this.recognizedString);
@@ -57,6 +66,10 @@ class VoiceInput extends React.Component {
 
 		recognition.onresult = event => {
 			this.recognizedString = Array.from(event.results).slice(event.resultIndex).map(elem => elem[0] ? elem[0].transcript : '').join(' ');
+
+			this.setState({
+				log: 'recognition.onresult',
+			});
 		};
 
 		this.recognition = recognition;
@@ -72,9 +85,9 @@ class VoiceInput extends React.Component {
 	}
 
 	startListening(delay = 0) {
-		const { isRecognizing } = this.state;
+		const { isRecording } = this.state;
 
-		if (isRecognizing) {
+		if (isRecording) {
 			return;
 		}
 
@@ -88,9 +101,9 @@ class VoiceInput extends React.Component {
 	}
 
 	stopListening() {
-		const { isRecognizing } = this.state;
+		const { isRecording } = this.state;
 
-		if (!isRecognizing) {
+		if (!isRecording) {
 			return;
 		}
 
@@ -102,15 +115,20 @@ class VoiceInput extends React.Component {
 	}
 
 	render() {
-		const { isRecognizing } = this.state;
+		const { isRecording, errorMessage } = this.state;
 
 		return (
-			<div>
-				{isRecognizing ? 'VoiceInput here' : ''}
-				<div>
-					<button onClick={() => this.startListening()}>start</button>
-					<button onClick={() => this.stopListening()}>stop</button>
-				</div>
+			<div className="voice-input">
+				<span
+					className={`voice-input__record-icon ${isRecording ? '_animating' : ''}`}
+					onClick={() => isRecording ? this.stopListening() : this.startListening()}
+				>
+					<SvgIcon name="voice-record" />
+				</span>
+
+				{errorMessage &&
+					<div className="voice-input__error">{errorMessage}</div>
+				}
 			</div>
 		);
 	}

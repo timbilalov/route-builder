@@ -1,0 +1,57 @@
+.map {
+	@include aspect-ratio(500, 400, relative, "> ymaps");
+
+	$parent-selector: &;
+
+	width: 100%;
+	background-color: #ccc;
+	border: 1px solid transparent;
+	box-sizing: border-box;
+	border-radius: $default-border-radius;
+	overflow: hidden;
+
+	&:after {
+		@extend %full-sized;
+
+		content: '';
+		z-index: 1;
+		background-color: $c-white;
+	}
+
+	&__spinner-wrapper {
+		@extend %centered-transform;
+
+		z-index: 2;
+	}
+
+	&__spinner {
+		@extend %spinner-default;
+	}
+
+	&:after,
+	&__spinner {
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity $default-transition-duration $default-transition-function;
+	}
+
+	&._calculating {
+		border-color: $c-lines;
+
+		&:after {
+			opacity: 0.8;
+			pointer-events: auto;
+		}
+
+		#{$parent-selector} {
+			&__spinner {
+				opacity: 1;
+			}
+		}
+	}
+}
+
+.description {
+	margin: 20px 0;
+	word-break: break-all;
+}

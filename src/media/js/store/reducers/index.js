@@ -1,8 +1,10 @@
 import { combineReducers } from 'redux';
-import addresses from './addresses';
+import stages from './stages';
+import city from './city';
 
 const reducers = combineReducers({
-	addresses,
+	stages,
+	city,
 });
 
 export default reducers;

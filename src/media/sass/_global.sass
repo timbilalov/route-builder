@@ -1,13 +1,4 @@
-// .pseudo
-// 	color: #000
-// 	border-bottom: 1px dotted
-// 	cursor: pointer
-// 	&:hover
-// 		color: #333
-// 		border-bottom: 1px dotted transparent
-
 .clearfix
-	// zoom: 1
 	&:after
 		content: " "
 		display: block
@@ -24,19 +15,6 @@
 	height: 0
 	overflow: hidden
 	z-index: -1
-
-// .video-container
-// 	position: relative
-// 	padding-bottom: 56.25%
-// 	padding-top: 30px
-// 	height: 0
-// 	overflow: hidden
-// 	iframe, object, embed
-// 		position: absolute
-// 		top: 0
-// 		left: 0
-// 		width: 100%
-// 		height: 100%
 
 .no-select
 	user-select: none
@@ -108,3 +86,14 @@
 
 %full-sized
 	+full-sized
+
+%centered-flex
+	display: flex
+	align-items: center
+	justify-content: center
+
+%centered-transform
+	position: absolute
+	left: 50%
+	top: 50%
+	transform: translate(-50%, -50%)
