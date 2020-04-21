@@ -3,6 +3,8 @@
 	user-select: none;
 	border: none;
 	background: none;
+	font: inherit;
+	line-height: inherit;
 }
 
 %button-base-colors {
@@ -11,14 +13,15 @@
 }
 
 %button-base {
-	@extend %button-reset, %button-base-colors, %centered-flex;
+	@extend %button-reset, %button-base-colors, %centering-flex;
 
 	display: inline-flex;
 	vertical-align: middle;
 	box-sizing: border-box;
 	text-align: center;
 	line-height: 1;
-	font-weight: bold;
+	font-weight: 500;
+	font-size: 1rem;
 	transition: color $default-transition-duration, background-color $default-transition-duration;
 	cursor: pointer;
 	border: 1px solid transparent;
@@ -32,12 +35,12 @@
 .button {
 	@extend %button-base;
 
-	padding: 10px 20px;
-	min-width: 150px;
-	border-radius: $default-border-radius;
+	padding: rel-size(10px) rel-size(20px);
+	min-width: rel-size(150px);
+	border-radius: rel-size($default-border-radius);
 
 	& + & {
-		margin-left: 10px;
+		margin-left: rel-size(10px);
 	}
 
 	&._outlined {

@@ -1,14 +1,17 @@
 .voice-input {
-	margin: 20px 0;
+	margin: rel-size(20px) 0;
 
 	&__record-icon {
 		@extend %button-base, %spinner-default;
 
+		$size: rel-size(30px);
+
 		position: relative;
-		width: 30px;
-		height: 30px;
-		padding: 7px;
+		width: $size;
+		height: $size;
+		padding: rel-size(7px);
 		border-radius: 100%;
+		pointer-events: auto;
 
 		&:before,
 		&:after {
@@ -28,7 +31,7 @@
 	&__error {
 		display: inline-block;
 		vertical-align: middle;
-		margin-left: 10px;
+		margin-left: rel-size(10px);
 		color: $c-error;
 	}
 }

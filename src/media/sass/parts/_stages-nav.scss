@@ -14,6 +14,7 @@
 		vertical-align: bottom;
 		padding: 0.4em 0.7em;
 		cursor: pointer;
+		transition: color $default-transition-duration $default-transition-function;
 
 		&:after {
 			content: '';
@@ -24,6 +25,11 @@
 			width: 100%;
 			height: 2px;
 			background-color: currentColor;
+		}
+
+		&:hover {
+			color: $c-accent;
+			transition: none;
 		}
 
 		&._active {

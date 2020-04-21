@@ -10,17 +10,13 @@ class App extends React.Component {
 		return (
 			<div className="app">
 				<div className="app__section _fields">
-					<div className="container">
-						<CitySelection />
-						<GameStages />
-						<FieldsList />
-						<Controls />
-					</div>
+					<CitySelection />
+					<GameStages />
+					<FieldsList />
+					<Controls />
 				</div>
 				<div className="app__section _map">
-					<div className="container">
-						<Map />
-					</div>
+					<Map />
 				</div>
 			</div>
 		);

@@ -1,6 +1,6 @@
 .container {
-	max-width: 980px;
+	max-width: rel-size(980px);
 	margin: auto;
 	box-sizing: content-box;
-	padding: 0 $site-paddings;
+	padding: 0 rel-size($site-paddings);
 }

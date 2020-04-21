@@ -39,7 +39,7 @@
 		border-color: $c-lines;
 
 		&:after {
-			opacity: 0.8;
+			opacity: 0.95;
 			pointer-events: auto;
 		}
 
@@ -52,6 +52,6 @@
 }
 
 .description {
-	margin: 20px 0;
+	margin: rel-size(20px) 0;
 	word-break: break-all;
 }

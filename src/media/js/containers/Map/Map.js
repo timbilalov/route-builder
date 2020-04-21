@@ -413,7 +413,7 @@ class Map extends React.Component {
 					</div>
 				}
 
-				{navigationLinks && navigationLinks.variant1 && navigationLinks.variant2 &&
+				{!isCalculating && navigationLinks && navigationLinks.variant1 && navigationLinks.variant2 &&
 					<div className="description">
 						<div>
 							<a href={navigationLinks.variant1} target="_blank" rel="nofollow noopener noreferrer">Общая навигация (вариант 1)</a>
@@ -424,7 +424,7 @@ class Map extends React.Component {
 					</div>
 				}
 
-				{routes.map((routeData, index) => {
+				{!isCalculating && routes.map((routeData, index) => {
 					return (
 						<Route key={index} data={routeData} map={this.ymap} />
 					);
