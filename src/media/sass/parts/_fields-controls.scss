@@ -1,0 +1,14 @@
+.fields-controls {
+	&__section {
+		margin-bottom: rel-size(10px);
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	.button {
+		min-width: 0;
+		justify-content: flex-start;
+	}
+}

@@ -1,7 +1,7 @@
 .input {
 	display: block;
-	width: 100%;
-	max-width: rel-size(250px);
+	width: rel-size($input-default-width);
+	box-sizing: border-box;
 	padding: rel-size(10px) rel-size(20px);
 	border-radius: $default-border-radius;
 	border: 1px solid $c-lines;

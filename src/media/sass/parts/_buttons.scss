@@ -5,6 +5,7 @@
 	background: none;
 	font: inherit;
 	line-height: inherit;
+	box-sizing: border-box;
 }
 
 %button-base-colors {
@@ -17,10 +18,9 @@
 
 	display: inline-flex;
 	vertical-align: middle;
-	box-sizing: border-box;
 	text-align: center;
 	line-height: 1;
-	font-weight: 500;
+	font-weight: 300;
 	font-size: 1rem;
 	transition: color $default-transition-duration, background-color $default-transition-duration;
 	cursor: pointer;
@@ -51,5 +51,9 @@
 		&:hover {
 			color: $c-accent;
 		}
+	}
+
+	&._disabled {
+		@extend %disabled;
 	}
 }

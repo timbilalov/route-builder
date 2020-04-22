@@ -86,7 +86,7 @@ class Map extends React.Component {
 					query.then(() => {
 						const geoObject = query.get(0);
 						const recognized = {
-							name: addressEntered,
+							name: addressEntered.replace(`${city} `, ''),
 							orderEntered: i + 1,
 							coordinates: geoObject.geometry.getCoordinates(),
 							geoObject,
@@ -304,14 +304,6 @@ class Map extends React.Component {
 		const coordinates = Array.from(sorted).map(item => item.coordinates);
 
 		const hrefParts = [];
-		hrefParts.push(`z=${this.mapInitialOptions.zoom}`);
-		hrefParts.push(
-			`ll=` +
-			this.mapInitialOptions.center
-				.slice(0)
-				.reverse()
-				.join(',')
-		);
 		hrefParts.push(`l=map`);
 		hrefParts.push('rtext=' + coordinates.map(el => `${el[0]},${el[1]}`).join('~'));
 		hrefParts.push(`rtn=0`);

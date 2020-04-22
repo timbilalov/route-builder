@@ -32,11 +32,11 @@ class FieldBlock extends React.Component {
 		return (
 			<div className="field-block">
 				<div className="field-block__container">
-					<small
-						className="field-block__number-entered"
+					<span
+						className="field-block__number-entered number-entered"
 					>
 						{this.props.order}
-					</small>
+					</span>
 					<input
 						type="text"
 						onChange={event => this.onChange(event.target.value)}

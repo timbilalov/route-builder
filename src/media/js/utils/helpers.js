@@ -7,10 +7,14 @@ function getSpeedByPace(pace = DEFAULT_PACE) {
 	});
 }
 
-export function getPrettyDuration(distance = 0, pace = DEFAULT_PACE) {
+export function getPrettyDuration(distance = 0, pace = DEFAULT_PACE, showPaceDescription = true) {
 	const speed = getSpeedByPace(pace);
 	const durationByPace = Math.round((distance / 1000) / speed * 60);
-	return `~ ${durationByPace} мин (при темпе ${pace})`;
+	let resultString = `~ ${durationByPace} мин`;
+	if (showPaceDescription) {
+		resultString += ` (при темпе ${pace})`;
+	}
+	return resultString;
 }
 
 export function getStageAddresses(stages) {

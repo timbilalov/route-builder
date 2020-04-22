@@ -15,22 +15,10 @@
 	}
 
 	&__number-entered {
-		@extend %centering-flex;
-
-		$size: rel-size(24px);
-		$border-size: rel-size(2px);
-
 		position: absolute;
 		left: rel-size(8px);
 		top: 50%;
-		margin-top: -$size / 2;
-		box-sizing: border-box;
-		border-radius: 100%;
-		width: $size;
-		height: $size;
-		border: $border-size solid $c-accent-2;
-		font-weight: 500;
-		text-align: center;
+		transform: translate(0, -50%);
 	}
 
 	&__button {

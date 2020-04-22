@@ -3,8 +3,8 @@
 	padding: rel-size(20px) 0;
 
 	&__section {
-		flex: 1 0 0;
 		margin-bottom: rel-size(20px);
+		box-sizing: border-box;
 
 		&:last-child {
 			margin-bottom: 0;
@@ -17,6 +17,7 @@
 		justify-content: space-between;
 
 		&__section {
+			width: 50%;
 			margin: 0;
 
 			&._fields {

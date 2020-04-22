@@ -1,0 +1,49 @@
+.route-segment {
+	padding: rel-size(20px);
+	margin-bottom: rel-size(20px);
+	background-color: $c-background-2;
+	border-radius: $default-border-radius;
+	transition: opacity $default-transition-duration $default-transition-function;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+
+	&__head {
+		margin-bottom: rel-size(10px);
+	}
+
+	&__head-level {
+		display: flex;
+		align-items: center;
+
+		&._level2 {
+			padding-left: rel-size(20px);
+		}
+	}
+
+	&__head-elem {
+		margin-right: rel-size(10px);
+
+		&:last-child {
+			margin-right: 0;
+		}
+	}
+
+	&__details {
+		font-style: italic;
+		font-size: 0.8em;
+	}
+
+	&__details-item {
+		margin-right: rel-size(20px);
+
+		&:last-child {
+			margin-right: 0;
+		}
+	}
+
+	&._completed {
+		@extend %disabled;
+	}
+}

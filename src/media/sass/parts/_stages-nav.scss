@@ -2,6 +2,13 @@
 	margin: 2rem 0;
 
 	&__buttons {
+		overflow: auto;
+		white-space: nowrap;
+		padding-bottom: rel-size(10px);
+		margin-bottom: rel-size(-10px);
+	}
+
+	&__list {
 		display: inline-block;
 		border-bottom: 1px solid $c-lines;
 	}
@@ -38,11 +45,6 @@
 			&:after {
 				display: block;
 			}
-		}
-
-		&._disabled {
-			opacity: 0.25;
-			pointer-events: none;
 		}
 	}
 }
