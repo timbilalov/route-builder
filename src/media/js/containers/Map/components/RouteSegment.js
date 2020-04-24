@@ -1,15 +1,46 @@
 import React from 'react';
-import { getPrettyDuration } from '../../../utils/helpers';
+import { getPrettyDuration, getStageCompletedSegments } from '../../../utils/helpers';
+import store from '../../../store';
+import { setCompletedSegment, unsetCompletedSegment } from '../../../store/actions';
+import { connect } from 'react-redux';
 
 class RouteSegment extends React.Component {
+	completeSegment() {
+		const { params } = this.props;
+		const { index } = params;
+
+		store.dispatch(setCompletedSegment(index));
+	}
+
+	uncompleteSegment() {
+		const { params } = this.props;
+		const { index } = params;
+
+		store.dispatch(unsetCompletedSegment(index));
+	}
+
+	toggleCompleted() {
+		const isCompleted = this.checkIsCompleted();
+
+		if (isCompleted) {
+			this.uncompleteSegment();
+		} else {
+			this.completeSegment();
+		}
+	}
+
+	checkIsCompleted() {
+		const { params, stages } = this.props;
+		const { index } = params;
+		const completedSegments = getStageCompletedSegments(stages);
+
+		return completedSegments.includes(index);
+	}
+
 	render() {
 		const { params } = this.props;
-		const {
-			coordinates,
-			addresses,
-			distance,
-		} = params;
-
+		const { coordinates, addresses, distance } = params;
+		const isCompleted = this.checkIsCompleted();
 		const pathHrefParts = [];
 
 		pathHrefParts.push(`l=map`);
@@ -27,7 +58,7 @@ class RouteSegment extends React.Component {
 		const pathAddressEnd = addresses.end;
 
 		return (
-			<div className="route-segment">
+			<div className={`route-segment ${isCompleted ? '_completed' : ''}`}>
 				<div className="route-segment__head">
 					<div className="route-segment__head-level _level1">
 						<span className="route-segment__head-elem">
@@ -57,9 +88,21 @@ class RouteSegment extends React.Component {
 						{getPrettyDuration(distance.value, undefined, false)}
 					</span>
 				</div>
+				<button
+					onClick={() => this.toggleCompleted()}
+					className={`route-segment__complete-button button _small ${isCompleted ? '_outlined' : ''}`}
+				>
+					✓
+				</button>
 			</div>
 		);
 	}
 }
 
-export default RouteSegment;
+const mapStateToProps = function(state) {
+	return {
+		stages: state.stages,
+	};
+};
+
+export default connect(mapStateToProps)(RouteSegment);

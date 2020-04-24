@@ -18,7 +18,11 @@ export function getPrettyDuration(distance = 0, pace = DEFAULT_PACE, showPaceDes
 }
 
 export function getStageAddresses(stages) {
-	return stages.values[stages.currentIndex].addresses;
+	return stages.values[stages.currentIndex].addresses || Array.from(DEFAULT_STAGE_VALUE.addresses);
+}
+
+export function getStageCompletedSegments(stages) {
+	return stages.values[stages.currentIndex].completedSegments || Array.from(DEFAULT_STAGE_VALUE.completedSegments);
 }
 
 export function getDefaultStageValue() {

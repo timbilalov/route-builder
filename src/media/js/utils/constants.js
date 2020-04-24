@@ -4,6 +4,7 @@ export const CITY_STORAGE_KEY = 'city';
 export const DEFAULT_PACE = '5:30';
 export const DEFAULT_STAGE_VALUE = {
 	addresses: [],
+	completedSegments: [],
 };
 export const DEFAULT_STAGES = {
 	currentIndex: 0,

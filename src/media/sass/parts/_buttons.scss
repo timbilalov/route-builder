@@ -56,4 +56,9 @@
 	&._disabled {
 		@extend %disabled;
 	}
+
+	&._small {
+		padding: rel-size(5px);
+		min-width: 0;
+	}
 }

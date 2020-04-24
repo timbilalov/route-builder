@@ -1,4 +1,7 @@
 .route-segment {
+	$parent-selector: &;
+
+	position: relative;
 	padding: rel-size(20px);
 	margin-bottom: rel-size(20px);
 	background-color: $c-background-2;
@@ -43,7 +46,19 @@
 		}
 	}
 
+	&__complete-button {
+		position: absolute;
+		right: rel-size(10px);
+		bottom: rel-size(10px);
+	}
+
 	&._completed {
 		@extend %disabled;
+
+		#{$parent-selector} {
+			&__complete-button {
+				pointer-events: auto;
+			}
+		}
 	}
 }
