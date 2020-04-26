@@ -1,9 +1,7 @@
 {% extends "../ext/base.nunj" %}
-{% block title %}Home {{ super() }}{% endblock title %}
 
 {% block content %}
-	<div class="container clearfix">
-		<h1>Route Builder (React)</h1>
+	<div class="container">
+		<div id="react-app"></div>
 	</div>
-	<div id="react-app"></div>
 {% endblock content %}

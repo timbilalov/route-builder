@@ -1,10 +1,10 @@
 import {
 	ADD_ADDRESS, ADD_NEW_STAGE,
 	CLEAR_ADDRESSES,
-	EDIT_ADDRESS,
+	EDIT_ADDRESS, MOVE_ADDRESS_AT_INDEX,
 	REMOVE_ADDRESS, REMOVE_STAGE,
 	SET_ACTIVE_STAGE,
-	SET_ADDRESSES,
+	SET_ADDRESSES, SET_COMPLETED_SEGMENT, UNSET_COMPLETED_SEGMENT,
 } from '../actions';
 import LocalStorage from '../../components/LocalStorage';
 import { STAGES_STORAGE_KEY } from '../../utils/constants';
@@ -18,7 +18,12 @@ export default function stages(state = savedStages || getDefaultStagesObject(), 
 	const { currentIndex, values } = newState;
 	const stagesCount = values.length;
 	const currentValue = values[currentIndex];
-	const currentStageAddresses = currentValue.addresses;
+
+	const currentStageAddresses = currentValue.addresses || [];
+	currentValue.addresses = currentStageAddresses;
+
+	const currentStageCompletedSegments = currentValue.completedSegments || [];
+	currentValue.completedSegments = currentStageCompletedSegments;
 
 	switch (type) {
 		case SET_ACTIVE_STAGE: {
@@ -58,7 +63,7 @@ export default function stages(state = savedStages || getDefaultStagesObject(), 
 			break;
 		}
 
-		case SET_ADDRESSES: {
+			case SET_ADDRESSES: {
 			const { addresses } = action;
 			currentValue.addresses = addresses;
 			break;
@@ -90,6 +95,31 @@ export default function stages(state = savedStages || getDefaultStagesObject(), 
 
 		case CLEAR_ADDRESSES: {
 			currentValue.addresses = [];
+			break;
+		}
+
+		case MOVE_ADDRESS_AT_INDEX: {
+			const { address, index } = action;
+			if (currentStageAddresses.includes(address)) {
+				const element = currentStageAddresses.splice(currentStageAddresses.indexOf(address), 1)[0];
+				currentStageAddresses.splice(index, 0, element);
+			}
+			break;
+		}
+
+		case SET_COMPLETED_SEGMENT: {
+			const { index } = action;
+			if (!currentStageCompletedSegments.includes(index)) {
+				currentStageCompletedSegments.push(index);
+			}
+			break;
+		}
+
+		case UNSET_COMPLETED_SEGMENT: {
+			const { index } = action;
+			if (currentStageCompletedSegments.includes(index)) {
+				currentStageCompletedSegments.splice(currentStageCompletedSegments.indexOf(index), 1);
+			}
 			break;
 		}
 	}

@@ -4,10 +4,10 @@
 	}
 }
 
-@mixin spinner($size: 30px) {
+@mixin spinner($size: rel-size(30px)) {
 	position: relative;
-	width: 30px;
-	height: 30px;
+	width: $size;
+	height: $size;
 	pointer-events: none;
 	border-radius: 100%;
 
@@ -23,21 +23,21 @@
 	}
 
 	&:before {
-		$padding: 3px;
-		$border-size: 2px;
+		$padding: rel-size(3px);
+		$border-size: rel-size(2px);
 		$offset: -($padding + $border-size);
 
 		margin-left: $offset;
 		margin-top: $offset;
 		border: $border-size solid transparent;
-		border-top-color: $c-accent-2;
+		border-top-color: $c-accent-4;
 		padding: $padding;
 		animation: rotation 0.5s infinite linear;
 	}
 
 	&:after {
-		$padding: 12px;
-		$border-size: 4px;
+		$padding: rel-size(12px);
+		$border-size: rel-size(4px);
 		$offset: -($padding + $border-size);
 
 		margin-left: $offset;

@@ -7,14 +7,22 @@ function getSpeedByPace(pace = DEFAULT_PACE) {
 	});
 }
 
-export function getPrettyDuration(distance = 0, pace = DEFAULT_PACE) {
+export function getPrettyDuration(distance = 0, pace = DEFAULT_PACE, showPaceDescription = true) {
 	const speed = getSpeedByPace(pace);
 	const durationByPace = Math.round((distance / 1000) / speed * 60);
-	return `~ ${durationByPace} мин (при темпе ${pace})`;
+	let resultString = `~ ${durationByPace} мин`;
+	if (showPaceDescription) {
+		resultString += ` (при темпе ${pace})`;
+	}
+	return resultString;
 }
 
 export function getStageAddresses(stages) {
-	return stages.values[stages.currentIndex].addresses;
+	return stages.values[stages.currentIndex].addresses || Array.from(DEFAULT_STAGE_VALUE.addresses);
+}
+
+export function getStageCompletedSegments(stages) {
+	return stages.values[stages.currentIndex].completedSegments || Array.from(DEFAULT_STAGE_VALUE.completedSegments);
 }
 
 export function getDefaultStageValue() {
@@ -102,7 +110,7 @@ export function findAllPermutations(length) {
 		console.warn(`Something wrong with permutations for N=${length}. Counters: total - ${permutations.length}, unique - ${permutationsUniqueCount}, both total and unique must be - ${permutationsRightCount}`)
 	}
 	const t2 = performance.now();
-	console.log(`found ${permutations.length} permutations in ${t2 - t1} ms`);
+	console.log(`found ${permutations.length} permutations in ${t2 - t1} ms`); // TEMP
 	return permutations;
 }
 

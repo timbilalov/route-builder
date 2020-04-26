@@ -11,6 +11,7 @@ class FieldBlock extends React.Component {
 		defaultValue: '',
 		onRemoveButtonClick: () => {},
 		onChange: () => {},
+		onFieldMove: () => {},
 		order: '',
 	};
 
@@ -29,28 +30,46 @@ class FieldBlock extends React.Component {
 	}
 
 	render() {
+		const { value } = this.state;
+
 		return (
 			<div className="field-block">
 				<div className="field-block__container">
-					<small
-						className="field-block__number-entered"
+					<span
+						className="field-block__number-entered number-entered"
 					>
 						{this.props.order}
-					</small>
+					</span>
 					<input
 						type="text"
 						onChange={event => this.onChange(event.target.value)}
-						value={this.state.value}
+						value={value}
 						ref="input"
 						className="input field-block__input"
 					/>
 					<button
 						onClick={() => this.props.onRemoveButtonClick(this.refs.input.value)}
 						tabIndex="-1"
-						className="field-block__button button _outlined"
+						className={`field-block__button button _outlined ${!value ? '_disabled' : ''}`}
 					>
 						×
 					</button>
+					{value &&
+						<>
+							<div
+								onClick={() => this.props.onFieldMove('up')}
+								className={`field-block__button button _outlined _arrows`}
+							>
+								↑
+							</div>
+							<div
+								onClick={() => this.props.onFieldMove('down')}
+								className={`field-block__button button _outlined _arrows`}
+							>
+								↓
+							</div>
+						</>
+					}
 				</div>
 			</div>
 		);

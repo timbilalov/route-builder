@@ -1,0 +1,34 @@
+.fields-controls {
+	&__section {
+		margin-bottom: rel-size(10px);
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		&._export {
+			display: flex;
+			align-items: center;
+		}
+	}
+
+	.button {
+		min-width: 0;
+		justify-content: flex-start;
+	}
+
+	&__hint {
+		margin-left: rel-size(10px);
+		font-size: 0.8em;
+		color: $c-text-secondary;
+		transition: opacity $default-transition-duration;
+		opacity: 0;
+		pointer-events: none;
+
+		&._active {
+			opacity: 1;
+			pointer-events: auto;
+			transition: none;
+		}
+	}
+}

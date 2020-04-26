@@ -1,5 +1,5 @@
 .field-block {
-	margin-bottom: 10px;
+	margin-bottom: rel-size(10px);
 
 	&:last-child {
 		margin-bottom: 0;
@@ -11,31 +11,19 @@
 	}
 
 	&__input {
-		padding-left: 40px;
+		padding-left: rel-size(40px);
 	}
 
 	&__number-entered {
-		@extend %centered-flex;
-
-		$size: 24px;
-		$border-size: 2px;
-
 		position: absolute;
-		left: 8px;
+		left: rel-size(8px);
 		top: 50%;
-		margin-top: -$size / 2;
-		box-sizing: border-box;
-		border-radius: 100%;
-		width: $size;
-		height: $size;
-		border: $border-size solid $c-accent-2;
-		font-weight: bold;
-		text-align: center;
+		transform: translate(0, -50%);
 	}
 
 	&__button {
 		min-width: 0;
-		margin-left: 10px;
+		margin-left: rel-size(10px);
 		padding-top: 0;
 		padding-bottom: 0;
 	}

@@ -1,4 +1,10 @@
 .footer {
-	padding: 20px 0;
-	background: #CCC;
+	padding: 1rem 0;
+	background: $c-background-2;
+
+	&__copyrights {
+		margin-top: 0.3em;
+		font-style: italic;
+		font-size: 0.8em;
+	}
 }

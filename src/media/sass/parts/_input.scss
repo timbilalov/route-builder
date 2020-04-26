@@ -1,8 +1,10 @@
 .input {
 	display: block;
-	width: 100%;
-	max-width: 250px;
-	padding: 10px 20px;
+	width: rel-size($input-default-width);
+	box-sizing: border-box;
+	padding: rel-size(10px) rel-size(20px);
 	border-radius: $default-border-radius;
 	border: 1px solid $c-lines;
+	font-size: 1rem;
+	font-weight: inherit;
 }

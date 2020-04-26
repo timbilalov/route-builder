@@ -1,29 +1,27 @@
 .app {
 	display: block;
-	padding: 20px 0;
+	padding: rel-size(20px) 0;
 
 	&__section {
-		flex: 1 0 0;
-		margin-bottom: 20px;
+		margin-bottom: rel-size(20px);
+		box-sizing: border-box;
 
 		&:last-child {
 			margin-bottom: 0;
 		}
 	}
 
-	@media screen and (min-width: 800px) {
+	@include screen-desktop {
 		display: flex;
 		flex-direction: row-reverse;
 		justify-content: space-between;
 
 		&__section {
+			width: 50%;
 			margin: 0;
 
-			&._map {
-				.container {
-					max-width: none;
-					padding: 0;
-				}
+			&._fields {
+				padding-left: rel-size(20px);
 			}
 		}
 	}

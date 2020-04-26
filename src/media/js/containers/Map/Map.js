@@ -86,7 +86,7 @@ class Map extends React.Component {
 					query.then(() => {
 						const geoObject = query.get(0);
 						const recognized = {
-							name: addressEntered,
+							name: addressEntered.replace(`${city} `, ''),
 							orderEntered: i + 1,
 							coordinates: geoObject.geometry.getCoordinates(),
 							geoObject,
@@ -270,7 +270,7 @@ class Map extends React.Component {
 				const wayPointAddress = addressObject.name;
 
 				wayPoint.options.set({
-					preset: 'islands#darkGreenCircleIcon',
+					preset: 'islands#darkOrangeCircleIcon',
 					iconContentLayout: ymaps.templateLayoutFactory.createClass(wayPointName),
 					balloonContentLayout: ymaps.templateLayoutFactory.createClass(wayPointAddress),
 				});
@@ -304,14 +304,6 @@ class Map extends React.Component {
 		const coordinates = Array.from(sorted).map(item => item.coordinates);
 
 		const hrefParts = [];
-		hrefParts.push(`z=${this.mapInitialOptions.zoom}`);
-		hrefParts.push(
-			`ll=` +
-			this.mapInitialOptions.center
-				.slice(0)
-				.reverse()
-				.join(',')
-		);
 		hrefParts.push(`l=map`);
 		hrefParts.push('rtext=' + coordinates.map(el => `${el[0]},${el[1]}`).join('~'));
 		hrefParts.push(`rtn=0`);
@@ -413,7 +405,7 @@ class Map extends React.Component {
 					</div>
 				}
 
-				{navigationLinks && navigationLinks.variant1 && navigationLinks.variant2 &&
+				{!isCalculating && navigationLinks && navigationLinks.variant1 && navigationLinks.variant2 &&
 					<div className="description">
 						<div>
 							<a href={navigationLinks.variant1} target="_blank" rel="nofollow noopener noreferrer">Общая навигация (вариант 1)</a>
@@ -424,7 +416,7 @@ class Map extends React.Component {
 					</div>
 				}
 
-				{routes.map((routeData, index) => {
+				{!isCalculating && routes.map((routeData, index) => {
 					return (
 						<Route key={index} data={routeData} map={this.ymap} />
 					);
