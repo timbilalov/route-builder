@@ -22,7 +22,7 @@
 	line-height: 1;
 	font-weight: 300;
 	font-size: 1rem;
-	transition: color $default-transition-duration, background-color $default-transition-duration;
+	transition: color $default-transition-duration, background-color $default-transition-duration, border-color $default-transition-duration;
 	cursor: pointer;
 	border: 1px solid transparent;
 
@@ -45,11 +45,12 @@
 
 	&._outlined {
 		background: none;
-		color: $c-button-oulined;
-		border-color: currentColor;
+		color: $c-text-secondary;
+		border-color: $c-button-oulined;
 
 		&:hover {
 			color: $c-accent;
+			border-color: currentColor;
 		}
 	}
 
@@ -65,5 +66,9 @@
 	&._arrows {
 		border-color: transparent;
 		padding: 0;
+
+		&:hover {
+			border-color: transparent;
+		}
 	}
 }

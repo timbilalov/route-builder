@@ -270,7 +270,7 @@ class Map extends React.Component {
 				const wayPointAddress = addressObject.name;
 
 				wayPoint.options.set({
-					preset: 'islands#darkGreenCircleIcon',
+					preset: 'islands#darkOrangeCircleIcon',
 					iconContentLayout: ymaps.templateLayoutFactory.createClass(wayPointName),
 					balloonContentLayout: ymaps.templateLayoutFactory.createClass(wayPointAddress),
 				});
