@@ -29,6 +29,8 @@ class FieldBlock extends React.Component {
 	}
 
 	render() {
+		const { value } = this.state;
+
 		return (
 			<div className="field-block">
 				<div className="field-block__container">
@@ -40,14 +42,14 @@ class FieldBlock extends React.Component {
 					<input
 						type="text"
 						onChange={event => this.onChange(event.target.value)}
-						value={this.state.value}
+						value={value}
 						ref="input"
 						className="input field-block__input"
 					/>
 					<button
 						onClick={() => this.props.onRemoveButtonClick(this.refs.input.value)}
 						tabIndex="-1"
-						className="field-block__button button _outlined"
+						className={`field-block__button button _outlined ${!value ? '_disabled' : ''}`}
 					>
 						×
 					</button>

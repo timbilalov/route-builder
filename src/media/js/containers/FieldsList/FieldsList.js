@@ -12,12 +12,18 @@ class FieldsList extends React.Component {
 	};
 
 	onFieldChange(value, index) {
+		value = value.trim();
+
 		const { stages } = this.props;
 		const addresses = getStageAddresses(stages);
 		const existingAddress = addresses[index];
 
 		if (existingAddress) {
-			store.dispatch(editAddress(existingAddress, value));
+			if (value) {
+				store.dispatch(editAddress(existingAddress, value));
+			} else {
+				store.dispatch(removeAddress(existingAddress));
+			}
 		} else {
 			store.dispatch(addAddress(value));
 		}
