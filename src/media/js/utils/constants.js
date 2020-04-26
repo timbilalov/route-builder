@@ -14,3 +14,4 @@ export const USE_WEBWORKER = true;
 export const USE_COMBINED_CALC = true;
 export const USE_JSON_FOR_WEBWORKER_DATA = true;
 export const MAX_CALC_MIN_DISTANCE_POINTS = 11;
+export const EXPORT_HREF_PARAM_NAME = 'values';

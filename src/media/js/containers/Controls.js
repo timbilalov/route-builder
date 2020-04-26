@@ -3,8 +3,16 @@ import store from '../store';
 import { addNewStage, clearAddresses, removeStage } from '../store/actions';
 import { connect } from 'react-redux';
 import { getStageAddresses } from '../utils/helpers';
+import LocalStorage from '../components/LocalStorage';
+import { EXPORT_HREF_PARAM_NAME } from '../utils/constants';
+
+const HINT_DEFAULT_DURATION = 2000;
 
 class Controls extends React.Component {
+	state = {
+		isHintVisible: false,
+	};
+
 	clearAddresses() {
 		store.dispatch(clearAddresses());
 	}
@@ -18,7 +26,35 @@ class Controls extends React.Component {
 		store.dispatch(addNewStage());
 	}
 
+	async makeExportUrl() {
+		const encodedString = LocalStorage.export(['city', 'stages']);
+
+		let urlToShare = window.location.href;
+		const hash = window.location.hash;
+		urlToShare = urlToShare.replace(hash, '');
+		urlToShare += `#${EXPORT_HREF_PARAM_NAME}=${encodedString}`;
+
+		const promise = new Promise(resolve => {
+			navigator.clipboard.writeText(urlToShare).then(function() {
+				resolve();
+			});
+		});
+
+		await promise;
+
+		this.setState({
+			isHintVisible: true,
+		});
+
+		setTimeout(() => {
+			this.setState({
+				isHintVisible: false,
+			});
+		}, HINT_DEFAULT_DURATION);
+	}
+
 	render() {
+		const { isHintVisible } = this.state;
 		const { stages } = this.props;
 		const { values } = stages;
 		const stagesCount = values.length;
@@ -28,6 +64,16 @@ class Controls extends React.Component {
 
 		return (
 			<div className="fields-controls">
+				<div className="fields-controls__section _export">
+					<button
+						onClick={() => this.makeExportUrl()}
+						className={`button _outlined ${currentStageAddresses.length || stagesCount > 1 ? '' : '_disabled'}`}
+					>
+						Экспорт
+					</button>
+
+					<span className={`fields-controls__hint ${isHintVisible ? '_active' : ''}`}>Ссылка скопирована в буфер</span>
+				</div>
 				<div className="fields-controls__section">
 					<button
 						onClick={() => this.clearAddresses()}
