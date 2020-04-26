@@ -110,7 +110,7 @@ export function findAllPermutations(length) {
 		console.warn(`Something wrong with permutations for N=${length}. Counters: total - ${permutations.length}, unique - ${permutationsUniqueCount}, both total and unique must be - ${permutationsRightCount}`)
 	}
 	const t2 = performance.now();
-	console.log(`found ${permutations.length} permutations in ${t2 - t1} ms`);
+	console.log(`found ${permutations.length} permutations in ${t2 - t1} ms`); // TEMP
 	return permutations;
 }
 

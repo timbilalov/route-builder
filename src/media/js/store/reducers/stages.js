@@ -1,7 +1,7 @@
 import {
 	ADD_ADDRESS, ADD_NEW_STAGE,
 	CLEAR_ADDRESSES,
-	EDIT_ADDRESS,
+	EDIT_ADDRESS, MOVE_ADDRESS_AT_INDEX,
 	REMOVE_ADDRESS, REMOVE_STAGE,
 	SET_ACTIVE_STAGE,
 	SET_ADDRESSES, SET_COMPLETED_SEGMENT, UNSET_COMPLETED_SEGMENT,
@@ -63,7 +63,7 @@ export default function stages(state = savedStages || getDefaultStagesObject(), 
 			break;
 		}
 
-		case SET_ADDRESSES: {
+			case SET_ADDRESSES: {
 			const { addresses } = action;
 			currentValue.addresses = addresses;
 			break;
@@ -95,6 +95,15 @@ export default function stages(state = savedStages || getDefaultStagesObject(), 
 
 		case CLEAR_ADDRESSES: {
 			currentValue.addresses = [];
+			break;
+		}
+
+		case MOVE_ADDRESS_AT_INDEX: {
+			const { address, index } = action;
+			if (currentStageAddresses.includes(address)) {
+				const element = currentStageAddresses.splice(currentStageAddresses.indexOf(address), 1)[0];
+				currentStageAddresses.splice(index, 0, element);
+			}
 			break;
 		}
 

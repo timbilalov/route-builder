@@ -11,6 +11,7 @@ class FieldBlock extends React.Component {
 		defaultValue: '',
 		onRemoveButtonClick: () => {},
 		onChange: () => {},
+		onFieldMove: () => {},
 		order: '',
 	};
 
@@ -53,6 +54,22 @@ class FieldBlock extends React.Component {
 					>
 						×
 					</button>
+					{value &&
+						<>
+							<div
+								onClick={() => this.props.onFieldMove('up')}
+								className={`field-block__button button _outlined _arrows`}
+							>
+								↑
+							</div>
+							<div
+								onClick={() => this.props.onFieldMove('down')}
+								className={`field-block__button button _outlined _arrows`}
+							>
+								↓
+							</div>
+						</>
+					}
 				</div>
 			</div>
 		);

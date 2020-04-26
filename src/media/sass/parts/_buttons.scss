@@ -61,4 +61,9 @@
 		padding: rel-size(5px);
 		min-width: 0;
 	}
+
+	&._arrows {
+		border-color: transparent;
+		padding: 0;
+	}
 }

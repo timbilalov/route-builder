@@ -37,3 +37,12 @@ export function clearAddresses() {
 		type: CLEAR_ADDRESSES,
 	};
 }
+
+export const MOVE_ADDRESS_AT_INDEX = 'MOVE_ADDRESS_AT_INDEX';
+export function moveAddressAtIndex(address, index) {
+	return {
+		type: MOVE_ADDRESS_AT_INDEX,
+		address,
+		index,
+	};
+}

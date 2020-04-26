@@ -1,7 +1,7 @@
 import React from 'react';
 import FieldBlock from './components/FieldBlock';
 import store from '../../store';
-import { addAddress, editAddress, removeAddress } from '../../store/actions';
+import { addAddress, editAddress, moveAddressAtIndex, removeAddress } from '../../store/actions';
 import { connect } from 'react-redux';
 import VoiceInput from '../../components/VoiceInput';
 import { getDefaultStagesObject, getStageAddresses } from '../../utils/helpers';
@@ -33,6 +33,19 @@ class FieldsList extends React.Component {
 		store.dispatch(removeAddress(value));
 	}
 
+	onFieldMove(index, direction) {
+		const { stages } = this.props;
+		const addresses = getStageAddresses(stages);
+
+		if (!['up', 'down'].includes(direction) || (index === 0 && direction === 'up') || (index === addresses.length - 1 && direction === 'down')) {
+			return;
+		}
+
+		const address = addresses[index];
+		const moveAt = direction === 'up' ? index - 1 : index + 1;
+		store.dispatch(moveAddressAtIndex(address, moveAt));
+	}
+
 	render() {
 		const { stages } = this.props;
 		const addresses = getStageAddresses(stages);
@@ -50,6 +63,7 @@ class FieldsList extends React.Component {
 							onChange={value => this.onFieldChange(value, index)}
 							defaultValue={value}
 							onRemoveButtonClick={value => this.onRemoveButtonClick(value)}
+							onFieldMove={direction => this.onFieldMove(index, direction)}
 						/>
 					);
 				})}
