@@ -1,5 +1,27 @@
 # Changelog
 
+## [v0.3.0](https://github.com/timbilalov/route-builder/tree/v0.3.0) (2020-04-26)
+
+[Full Changelog](https://github.com/timbilalov/route-builder/compare/v0.2.1...v0.3.0)
+
+
+**Commits:**
+* New feature: export/import stages data by url
+* Some look and feel changes
+* New feature: move entered addresses
+* Fixed bug with empty value for address field
+* New feature: completed/uncompleted route segments
+* Visual improvements, chunk 2.
+* Visual improvements, chunk 1.
+
+## [v0.2.1](https://github.com/timbilalov/route-builder/tree/v0.2.1) (2020-04-19)
+
+[Full Changelog](https://github.com/timbilalov/route-builder/compare/v0.2.0...v0.2.1)
+
+
+**Commits:**
+* Hotfix: publicPath for worker file
+
 ## [v0.2.0](https://github.com/timbilalov/route-builder/tree/v0.2.0) (2020-04-19)
 
 [Full Changelog](https://github.com/timbilalov/route-builder/compare/v0.1.0...v0.2.0)
