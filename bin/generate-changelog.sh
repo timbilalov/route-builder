@@ -5,6 +5,7 @@ function escapeSomeMarkdownChars {
 }
 
 BASEDIR=$(dirname $0)
+branchNameReleaseFrom=dev
 
 # Set files paths
 filePathTags="${BASEDIR}/../temp/tags.txt"
@@ -49,9 +50,9 @@ while read line; do
 	echo "**Commits:**" >> "${filePathHistory}"
 
 	if [ -z "$dateFrom" ]; then
-		git log --oneline --until="${dateTo}" --pretty=format:"* %s" | escapeSomeMarkdownChars >> "${filePathHistory}"
+		git log --oneline --until="${dateTo}" --pretty=format:"* %s" "${branchNameReleaseFrom}" | escapeSomeMarkdownChars >> "${filePathHistory}"
 	else
-		git log --oneline --since="${dateFrom}" --until="${dateTo}" --pretty=format:"* %s" | escapeSomeMarkdownChars >> "${filePathHistory}"
+		git log --oneline --since="${dateFrom}" --until="${dateTo}" --pretty=format:"* %s" "${branchNameReleaseFrom}" | escapeSomeMarkdownChars >> "${filePathHistory}"
 	fi
 	echo $'\r' >> "${filePathHistory}"
 

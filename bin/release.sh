@@ -66,6 +66,14 @@ fi
 
 echo "Starting a new release: $enteredVersion"
 
+git checkout "${branchNameReleaseTo}" && git pull origin "${branchNameReleaseTo}"
+git merge --squash --no-commit -X theirs "${branchNameReleaseFrom}" && git commit -m "${RELEASE_PREFIX} ${enteredVersion}"
+lastCommitHash=`git log --pretty='format:%h' -1`
+git tag -a "v${enteredVersion}" -m "${RELEASE_PREFIX} ${enteredVersion}" "${lastCommitHash}"
+git push --tags
+
+/bin/bash "${filePathChangelogGeneration}"
+
 filesToReplace=(
 	package.json
 	src/templates/parts/_footer.nunj
@@ -76,13 +84,7 @@ do
 	sed -i '' "s/$currentVersion/$enteredVersion/g" "$file"
 done
 
-git checkout "${branchNameReleaseTo}" && git pull origin "${branchNameReleaseTo}"
-git merge --squash --no-commit -X theirs "${branchNameReleaseFrom}" && git commit -m "${RELEASE_PREFIX} ${enteredVersion}"
-lastCommitHash=`git log --pretty='format:%h' -1`
-git tag -a v"${$enteredVersion}" -m "${RELEASE_PREFIX} ${enteredVersion}" "${lastCommitHash}"
-git push --tags
-
-/bin/bash "${filePathChangelogGeneration}"
 git add .
-git commit --amend
+git commit --amend -m "${RELEASE_PREFIX} ${enteredVersion}"
+
 #git push origin "${branchNameReleaseTo}"
