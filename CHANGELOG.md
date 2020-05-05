@@ -1,5 +1,19 @@
 # Changelog
 
+## [v0.3.1](https://github.com/timbilalov/route-builder/tree/v0.3.1) (2020-05-05)
+
+[Full Changelog](https://github.com/timbilalov/route-builder/compare/v0.3.0...v0.3.1)
+
+
+**Commits:**
+* Versioning and changelog generating, part 6
+* Versioning and changelog generating, part 5
+* Versioning and changelog generating, part 4
+* Versioning and changelog generating, part 3
+* Versioning and changelog generating, part 2
+* Versioning and changelog generating, part 1
+* Fixed situation, when completed segments remains completed even if addresses have changed
+
 ## [v0.3.0](https://github.com/timbilalov/route-builder/tree/v0.3.0) (2020-04-26)
 
 [Full Changelog](https://github.com/timbilalov/route-builder/compare/v0.2.1...v0.3.0)

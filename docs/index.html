@@ -2,14 +2,13 @@
 <html>
 
 <head>
-    <!-- Client-side programming by sborkaproject.com -->
     <meta charset="utf-8" />
-    <title>Home | Route Builder</title>
+    <title>Построение оптимального маршрута</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
     <script type="text/javascript">!function(){function e(e){return a.indexOf(e)>-1}function t(e){return r.indexOf(e)>-1}function o(e){return d.indexOf(e)>-1}var n=[],i=navigator,a=i.platform.toLowerCase(),r=i.userAgent.toLowerCase(),d=i.appName.toLowerCase(),l=document.documentElement,s=(localStorage,t("iphone")||t("ipod")||t("ipad")||t("android")||t("iemobile")||t("blackberry")||t("bada")?"_mobile":"_desktop");n.push(s);var m="";t("ipad")||t("iphone")||t("ipod")?m="_ios":t("android")?m="_android":e("win")?m="_win":e("mac")?m="_mac":e("linux")&&(m="_linux"),n.push(m);var c="";t("firefox")?c="_ff":t("opr")?c="_opera":t("yabrowser")?c="_yandex":t("edge")?c="_edge":t("trident")||o("explorer")||o("msie")?c="_ie":t("safari")&&!t("chrome")?c="_safari":t("chrome")&&(c="_chrome"),n.push(c),window.environmentObject={platform:s,os:m,browser:c},l.className+=" "+n.join(" ");var u=new XMLHttpRequest;if(u.open("GET","media/svg/sprite.svg",!0),u.overrideMimeType("image/svg+xml"),u.onreadystatechange=function(){function e(){document.body?document.body.appendChild(t):setTimeout(e,16)}if(u.readyState===XMLHttpRequest.DONE&&200===u.status){var t=document.createElement("div");t.className="invisible-container",t.appendChild(u.responseXML.documentElement),e()}},u.send(""),localStorage&&localStorage.getItem("fix100vhValue"))document.documentElement.classList.add("_fix100vh"),"function"==typeof document.documentElement.style.setProperty&&document.documentElement.style.setProperty("--fix100vhValue",localStorage.getItem("fix100vhValue")+"px");else{var p=function(){if(document.body){var e=document.createElement("div"),t=e.style;t.visibility="hidden",t.position="absolute",t.left="0",t.top="0",t.width="1px",t.height="100vh",document.body.appendChild(e);var o=e.clientHeight;e.parentNode.removeChild(e);var n=o-window.innerHeight;Math.abs(n)>10&&(document.documentElement.classList.add("_fix100vh"),"function"==typeof document.documentElement.style.setProperty&&document.documentElement.style.setProperty("--fix100vhValue",n+"px"),localStorage&&localStorage.setItem("fix100vhValue",n))}else setTimeout(p,16)};p()}}();</script>
 
-    <link rel="stylesheet" href="media/css/screen.css?5a441438be92a1ac8fff4a5fe3209638" />
+    <link rel="stylesheet" href="media/css/screen.css?4c14b82a280cfebb076f36f37ca3c4f8" />
 </head>
 
 <body>
@@ -17,14 +16,13 @@
         <div class="wrapper__header">
             <div class="header">
                 <div class="container">
-                    Header Content
+                    <h1>Построение оптимального маршрута</h1>
                 </div>
             </div>
         </div>
 
         <div class="wrapper__content">
-            <div class="container clearfix">
-                <h1>Route Builder (React)</h1>
+            <div class="container">
                 <div id="react-app"></div>
             </div>
         </div>
@@ -32,13 +30,14 @@
         <div class="wrapper__footer">
             <div class="footer">
                 <div class="container">
-                    Footer Content
+                    <div>Route builder 0.3.1</div>
+                    <div class="footer__copyrights">&copy;&nbsp;2019-2020 Тимур Билалов</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="media/js/bundle.js?f2904e50933a217182bb391fc84f0290"></script>
+    <script src="media/js/bundle.js?a169986801c5385a119cfdfb1d3bf7fa"></script>
 </body>
 
 </html>
