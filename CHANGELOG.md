@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.3.2](https://github.com/timbilalov/route-builder/tree/v0.3.2) (2020-05-05)
+
+[Full Changelog](https://github.com/timbilalov/route-builder/compare/v0.3.1...v0.3.2)
+
+
+**Commits:**
+* Exclude merge-commits from changelog
+
 ## [v0.3.1](https://github.com/timbilalov/route-builder/tree/v0.3.1) (2020-05-05)
 
 [Full Changelog](https://github.com/timbilalov/route-builder/compare/v0.3.0...v0.3.1)
