@@ -12,7 +12,6 @@ filePathTags="${BASEDIR}/../temp/tags.txt"
 filePathDates="${BASEDIR}/../temp/tags-dates.txt"
 filePathChangelog="${BASEDIR}/../CHANGELOG.md"
 filePathChangelogTemp="${BASEDIR}/../CHANGELOG-TEMP.md"
-filePathChangelogTemp2="${BASEDIR}/../CHANGELOG-TEMP2.md"
 
 # Generate "raw" changelog file
 github_changelog_generator
