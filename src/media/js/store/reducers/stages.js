@@ -25,6 +25,20 @@ export default function stages(state = savedStages || getDefaultStagesObject(), 
 	const currentStageCompletedSegments = currentValue.completedSegments || [];
 	currentValue.completedSegments = currentStageCompletedSegments;
 
+	const addressesActionTypes = [
+		SET_ADDRESSES,
+		ADD_ADDRESS,
+		REMOVE_ADDRESS,
+		EDIT_ADDRESS,
+		CLEAR_ADDRESSES,
+		MOVE_ADDRESS_AT_INDEX,
+	];
+
+	// NOTE: При изменении списка адресов, проще всего сбрасывать все чекнутые этапы.
+	if (addressesActionTypes.includes(type)) {
+		currentValue.completedSegments = [];
+	}
+
 	switch (type) {
 		case SET_ACTIVE_STAGE: {
 			let { index } = action;
@@ -63,7 +77,7 @@ export default function stages(state = savedStages || getDefaultStagesObject(), 
 			break;
 		}
 
-			case SET_ADDRESSES: {
+		case SET_ADDRESSES: {
 			const { addresses } = action;
 			currentValue.addresses = addresses;
 			break;
