@@ -1,5 +1,19 @@
 # Changelog
 
+## [v0.3.4](https://github.com/timbilalov/route-builder/tree/v0.3.4) (2020-05-06)
+
+[Full Changelog](https://github.com/timbilalov/route-builder/compare/v0.3.3...v0.3.4)
+
+**Implemented enhancements:**
+
+- Exclude PR merge-commits from changelog [\#11](https://github.com/timbilalov/route-builder/issues/11)
+- Add link to changelog in README.md [\#9](https://github.com/timbilalov/route-builder/issues/9)
+
+
+**Commits:**
+* Exclude PR merge-commits from changelog
+* Add link to changelog in README.md
+
 ## [v0.3.3](https://github.com/timbilalov/route-builder/tree/v0.3.3) (2020-05-05)
 
 [Full Changelog](https://github.com/timbilalov/route-builder/compare/v0.3.2...v0.3.3)
