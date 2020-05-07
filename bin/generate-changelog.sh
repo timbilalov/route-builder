@@ -6,6 +6,7 @@ function escapeSomeMarkdownChars {
 
 BASEDIR=$(dirname $0)
 branchNameReleaseFrom=dev
+commitsListHeading=Commits
 
 # Set files paths
 filePathTags="${BASEDIR}/../temp/tags.txt"
@@ -15,6 +16,7 @@ filePathChangelogTemp="${BASEDIR}/../CHANGELOG-TEMP.md"
 
 # Generate "raw" changelog file
 github_changelog_generator
+changelogContent=`cat $filePathChangelog`
 
 # Prepare dirs and files
 mkdir -p "${BASEDIR}/../temp"
@@ -36,17 +38,17 @@ done < "${filePathTags}"
 
 # Create commits list for every release
 # and merge it into "raw" changelog file
+# (but only if there isn't any other info)
 i=0
 dateFrom=
 while read line; do
-	j=$(($j-$i))
 	filePathHistory="${BASEDIR}/../temp/${tagsArray[i]}.md"
 	rm -rf "${filePathHistory}"
 
 	dateTo="${line}"
 
 	echo $'\r' >> "${filePathHistory}"
-	echo "**Commits:**" >> "${filePathHistory}"
+	echo "**$commitsListHeading:**" >> "${filePathHistory}"
 
 	if [ -z "$dateFrom" ]; then
 		git log --oneline --until="${dateTo}" --pretty=format:"* %s" "${branchNameReleaseFrom}" | grep -v 'Merge' | escapeSomeMarkdownChars >> "${filePathHistory}"
@@ -61,7 +63,23 @@ while read line; do
 		n=`sed -n "/\[${tagsArray[i-1]}\]/=" "${filePathChangelogTemp}"`
 	fi
 
-	sed -i '' "$(($n - 1))r ${filePathHistory}" "${filePathChangelogTemp}"
+	# Check for some existing info
+	shouldInsertCommitsInfo=false
+	re="\[${tagsArray[i]}\].+"
+	if [[ $i > 0 ]]; then
+		re+="\[${tagsArray[i-1]}\]"
+	fi
+	if [[ $changelogContent =~ $re ]]; then
+		someInfo=`echo ${BASH_REMATCH[0]} | grep -e $commitsListHeading -e 'Security fixes' -e 'Unreleased' -e 'Removed' -e 'Deprecated' -e 'Fixed bugs' -e 'Implemented enhancements' -e 'Breaking changes' -e 'Closed issues' -e 'Merged pull requests' | grep ':'`
+		if [ -z "$someInfo" ]; then
+			shouldInsertCommitsInfo=true
+		fi
+	fi
+
+	# Insert commits list if no other info exists
+	if [ "$shouldInsertCommitsInfo" = true ]; then
+		sed -i '' "$(($n - 1))r ${filePathHistory}" "${filePathChangelogTemp}"
+	fi
 
 	dateFrom="${line}"
 	i=$(($i+1))
