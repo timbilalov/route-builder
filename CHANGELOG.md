@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.3.6](https://github.com/timbilalov/route-builder/tree/v0.3.6) (2020-08-16)
+
+[Full Changelog](https://github.com/timbilalov/route-builder/compare/v0.3.5...v0.3.6)
+
+
+**Commits:**
+* Fixed some github_changelog_generator warnings about PR (#19)
+
 ## [v0.3.5](https://github.com/timbilalov/route-builder/tree/v0.3.5) (2020-05-07)
 
 [Full Changelog](https://github.com/timbilalov/route-builder/compare/v0.3.4...v0.3.5)
