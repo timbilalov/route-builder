@@ -1,3 +1,6 @@
 user=timbilalov
 project=route-builder
 unreleased=false
+release_branch=dev
+# NOTE: Вообще, это не оч. хорошо. Но если включить, то будут дублироваться те PR, которые всего лишь закрывают Issues.
+pulls=false
